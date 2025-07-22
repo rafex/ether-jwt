@@ -1,0 +1,10 @@
+bin/
+target/
+
+#.sts4-cache/
+.sts*cache/
+
+.settings/
+.classpath
+.project
+.idea/

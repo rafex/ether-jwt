@@ -1,0 +1,343 @@
+/**
+ * 	Copyright (C) August 2019 Raúl Eduardo González Argote - rafex@rafex.dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by
+ * the Free Software Foundation, version 3, 29 June 2007
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *                   GNU LESSER GENERAL PUBLIC LICENSE
+ *                        Version 3, 29 June 2007
+ *
+ *  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ *  Everyone is permitted to copy and distribute verbatim copies
+ *  of this license document, but changing it is not allowed.
+ *
+ *
+ *   This version of the GNU Lesser General Public License incorporates
+ * the terms and conditions of version 3 of the GNU General Public
+ * License, supplemented by the additional permissions listed below.
+ *
+ *   0. Additional Definitions.
+ *
+ *   As used herein, "this License" refers to version 3 of the GNU Lesser
+ * General Public License, and the "GNU GPL" refers to version 3 of the GNU
+ * General Public License.
+ *
+ *   "The Library" refers to a covered work governed by this License,
+ * other than an Application or a Combined Work as defined below.
+ *
+ *   An "Application" is any work that makes use of an interface provided
+ * by the Library, but which is not otherwise based on the Library.
+ * Defining a subclass of a class defined by the Library is deemed a mode
+ * of using an interface provided by the Library.
+ *
+ *   A "Combined Work" is a work produced by combining or linking an
+ * Application with the Library.  The particular version of the Library
+ * with which the Combined Work was made is also called the "Linked
+ * Version".
+ *
+ *   The "Minimal Corresponding Source" for a Combined Work means the
+ * Corresponding Source for the Combined Work, excluding any source code
+ * for portions of the Combined Work that, considered in isolation, are
+ * based on the Application, and not on the Linked Version.
+ *
+ *   The "Corresponding Application Code" for a Combined Work means the
+ * object code and/or source code for the Application, including any data
+ * and utility programs needed for reproducing the Combined Work from the
+ * Application, but excluding the System Libraries of the Combined Work.
+ *
+ *   1. Exception to Section 3 of the GNU GPL.
+ *
+ *   You may convey a covered work under sections 3 and 4 of this License
+ * without being bound by section 3 of the GNU GPL.
+ *
+ *   2. Conveying Modified Versions.
+ *
+ *   If you modify a copy of the Library, and, in your modifications, a
+ * facility refers to a function or data to be supplied by an Application
+ * that uses the facility (other than as an argument passed when the
+ * facility is invoked), then you may convey a copy of the modified
+ * version:
+ *
+ *    a) under this License, provided that you make a good faith effort to
+ *    ensure that, in the event an Application does not supply the
+ *    function or data, the facility still operates, and performs
+ *    whatever part of its purpose remains meaningful, or
+ *
+ *    b) under the GNU GPL, with none of the additional permissions of
+ *    this License applicable to that copy.
+ *
+ *   3. Object Code Incorporating Material from Library Header Files.
+ *
+ *   The object code form of an Application may incorporate material from
+ * a header file that is part of the Library.  You may convey such object
+ * code under terms of your choice, provided that, if the incorporated
+ * material is not limited to numerical parameters, data structure
+ * layouts and accessors, or small macros, inline functions and templates
+ * (ten or fewer lines in length), you do both of the following:
+ *
+ *    a) Give prominent notice with each copy of the object code that the
+ *    Library is used in it and that the Library and its use are
+ *    covered by this License.
+ *
+ *    b) Accompany the object code with a copy of the GNU GPL and this license
+ *    document.
+ *
+ *   4. Combined Works.
+ *
+ *   You may convey a Combined Work under terms of your choice that,
+ * taken together, effectively do not restrict modification of the
+ * portions of the Library contained in the Combined Work and reverse
+ * engineering for debugging such modifications, if you also do each of
+ * the following:
+ *
+ *    a) Give prominent notice with each copy of the Combined Work that
+ *    the Library is used in it and that the Library and its use are
+ *    covered by this License.
+ *
+ *    b) Accompany the Combined Work with a copy of the GNU GPL and this license
+ *    document.
+ *
+ *    c) For a Combined Work that displays copyright notices during
+ *    execution, include the copyright notice for the Library among
+ *    these notices, as well as a reference directing the user to the
+ *    copies of the GNU GPL and this license document.
+ *
+ *    d) Do one of the following:
+ *
+ *        0) Convey the Minimal Corresponding Source under the terms of this
+ *        License, and the Corresponding Application Code in a form
+ *        suitable for, and under terms that permit, the user to
+ *        recombine or relink the Application with a modified version of
+ *        the Linked Version to produce a modified Combined Work, in the
+ *        manner specified by section 6 of the GNU GPL for conveying
+ *        Corresponding Source.
+ *
+ *        1) Use a suitable shared library mechanism for linking with the
+ *        Library.  A suitable mechanism is one that (a) uses at run time
+ *        a copy of the Library already present on the user's computer
+ *        system, and (b) will operate properly with a modified version
+ *        of the Library that is interface-compatible with the Linked
+ *        Version.
+ *
+ *    e) Provide Installation Information, but only if you would otherwise
+ *    be required to provide such information under section 6 of the
+ *    GNU GPL, and only to the extent that such information is
+ *    necessary to install and execute a modified version of the
+ *    Combined Work produced by recombining or relinking the
+ *    Application with a modified version of the Linked Version. (If
+ *    you use option 4d0, the Installation Information must accompany
+ *    the Minimal Corresponding Source and Corresponding Application
+ *    Code. If you use option 4d1, you must provide the Installation
+ *    Information in the manner specified by section 6 of the GNU GPL
+ *    for conveying Corresponding Source.)
+ *
+ *   5. Combined Libraries.
+ *
+ *   You may place library facilities that are a work based on the
+ * Library side by side in a single library together with other library
+ * facilities that are not Applications and are not covered by this
+ * License, and convey such a combined library under terms of your
+ * choice, if you do both of the following:
+ *
+ *    a) Accompany the combined library with a copy of the same work based
+ *    on the Library, uncombined with any other library facilities,
+ *    conveyed under the terms of this License.
+ *
+ *    b) Give prominent notice with the combined library that part of it
+ *    is a work based on the Library, and explaining where to find the
+ *    accompanying uncombined form of the same work.
+ *
+ *   6. Revised Versions of the GNU Lesser General Public License.
+ *
+ *   The Free Software Foundation may publish revised and/or new versions
+ * of the GNU Lesser General Public License from time to time. Such new
+ * versions will be similar in spirit to the present version, but may
+ * differ in detail to address new problems or concerns.
+ *
+ *   Each version is given a distinguishing version number. If the
+ * Library as you received it specifies that a certain numbered version
+ * of the GNU Lesser General Public License "or any later version"
+ * applies to it, you have the option of following the terms and
+ * conditions either of that published version or of any later version
+ * published by the Free Software Foundation. If the Library as you
+ * received it does not specify a version number of the GNU Lesser
+ * General Public License, you may choose any version of the GNU Lesser
+ * General Public License ever published by the Free Software Foundation.
+ *
+ *   If the Library as you received it specifies that a proxy can decide
+ * whether future versions of the GNU Lesser General Public License shall
+ * apply, that proxy's public statement of acceptance of any version is
+ * permanent authorization for you to choose that version for the
+ * Library.
+ */
+package dev.rafex.ether.test.jwt;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import dev.rafex.ether.jwt.impl.JWebTokenImpl;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+
+public class TestJWebToken {
+
+	LocalDateTime ldt;
+	
+
+
+ObjectMapper objectMapper;
+JsonNode payload;
+
+@BeforeEach
+void setUp() throws Exception {
+    ldt = LocalDateTime.now().plusDays(90);
+    objectMapper = new ObjectMapper();
+    String json = "{\"sub\":\"1234\",\"aud\":[\"admin\"],\"exp\":" + ldt.toEpochSecond(ZoneOffset.UTC) + "}";
+    payload = objectMapper.readTree(json);
+}
+
+@Test
+void createJson() throws Exception {
+    ObjectNode jsonObject = objectMapper.createObjectNode();
+    String[] aud = { "admin", "user" };
+    jsonObject.put("sub", "jajaja");
+    ArrayNode audArray = objectMapper.valueToTree(aud);
+    jsonObject.set("aud", audArray);
+
+    System.out.println(jsonObject.toString());
+
+    JsonNode jsonElement = jsonObject.get("aud");
+    ArrayNode asJsonArray = (ArrayNode) jsonElement;
+
+    System.out.println(asJsonArray);
+}
+
+
+	@Test
+	void testWithData() {
+		// generate JWT
+		final long exp = LocalDateTime.now().plusDays(90).toEpochSecond(ZoneOffset.UTC);
+//		final JWebToken jWebToken = new JWebToken("1234", jsonParser.parse("['admin']").getAsJsonArray(), exp);
+		final String[] audience = { "admin" };
+		final JWebTokenImpl jWebToken = new JWebTokenImpl.Builder().subject("1234").expiration(exp).audience(audience).build();
+		final String token = jWebToken.toString();
+		// verify and use
+		JWebTokenImpl incomingToken;
+		System.out.println(token);
+		try {
+			incomingToken = new JWebTokenImpl(token);
+			Assertions.assertTrue(incomingToken.isValid());
+			Assertions.assertEquals("1234", incomingToken.getSubject());
+			Assertions.assertEquals("admin", incomingToken.getAudience().get(0));
+		} catch (final NoSuchAlgorithmException ex) {
+			fail("Invalid Token" + ex.getMessage());
+		}
+
+	}
+
+	@Test
+	void expire5Minutes() {
+		// generate JWT
+//		final JWebToken jWebToken = new JWebToken("1234", jsonParser.parse("['admin']").getAsJsonArray(), exp);
+		final String[] audience = { "admin" };
+		final JWebTokenImpl jWebToken = new JWebTokenImpl.Builder().subject("1234").expirationPlusMinutes(5).audience(audience).build();
+		final String token = jWebToken.toString();
+		// verify and use
+		JWebTokenImpl incomingToken;
+		System.out.println(token);
+		try {
+			incomingToken = new JWebTokenImpl(token);
+			Assertions.assertTrue(incomingToken.isValid());
+			Assertions.assertEquals("1234", incomingToken.getSubject());
+			Assertions.assertEquals("admin", incomingToken.getAudience().get(0));
+		} catch (final NoSuchAlgorithmException ex) {
+			fail("Invalid Token" + ex.getMessage());
+		}
+
+	}
+
+	@Test
+	void notBefore1Second() throws InterruptedException {
+		// generate JWT
+//		final JWebToken jWebToken = new JWebToken("1234", jsonParser.parse("['admin']").getAsJsonArray(), exp);
+		final String[] audience = { "admin" };
+		final JWebTokenImpl jWebToken = new JWebTokenImpl.Builder().subject("1234").expirationPlusMinutes(5).notBeforePlusSeconds(1).audience(audience).build();
+		final String token = jWebToken.toString();
+		TimeUnit.SECONDS.sleep(2);
+		// verify and use
+		JWebTokenImpl incomingToken;
+		System.out.println(token);
+		try {
+			incomingToken = new JWebTokenImpl(token);
+			Assertions.assertTrue(incomingToken.isValid());
+			Assertions.assertEquals("1234", incomingToken.getSubject());
+			Assertions.assertEquals("admin", incomingToken.getAudience().get(0));
+		} catch (final NoSuchAlgorithmException ex) {
+			fail("Invalid Token" + ex.getMessage());
+		}
+
+	}
+
+	@Test
+	@Disabled("for demonstration purposes")
+	void expire1MinuteFail() throws InterruptedException {
+		// generate JWT
+//		final JWebToken jWebToken = new JWebToken("1234", jsonParser.parse("['admin']").getAsJsonArray(), exp);
+		final String[] audience = { "admin" };
+		final JWebTokenImpl jWebToken = new JWebTokenImpl.Builder().subject("1234").expirationPlusMinutes(1).audience(audience).build();
+		final String token = jWebToken.toString();
+		TimeUnit.MINUTES.sleep(2);
+		// verify and use
+		JWebTokenImpl incomingToken;
+		System.out.println(token);
+		try {
+			incomingToken = new JWebTokenImpl(token);
+			Assertions.assertFalse(incomingToken.isValid());
+		} catch (final NoSuchAlgorithmException ex) {
+			fail("Invalid Token" + ex.getMessage());
+		}
+
+	}
+
+	@Test
+	void addClaim() {
+		// generate JWT
+		final long exp = LocalDateTime.now().plusDays(90).toEpochSecond(ZoneOffset.UTC);
+//		final JWebToken jWebToken = new JWebToken("1234", jsonParser.parse("['admin']").getAsJsonArray(), exp);
+		final String[] audience = { "admin" };
+		final JWebTokenImpl jWebToken = new JWebTokenImpl.Builder().subject("1234").claim("user", "rafex").expiration(exp).audience(audience).build();
+		final String token = jWebToken.toString();
+		// verify and use
+		JWebTokenImpl incomingToken;
+		System.out.println(token);
+		try {
+			incomingToken = new JWebTokenImpl(token);
+			Assertions.assertTrue(incomingToken.isValid());
+			Assertions.assertEquals("1234", incomingToken.getSubject());
+			Assertions.assertEquals("rafex", incomingToken.get("user"));
+			Assertions.assertEquals("admin", incomingToken.getAudience().get(0));
+		} catch (final NoSuchAlgorithmException ex) {
+			fail("Invalid Token" + ex.getMessage());
+		}
+
+	}
+
+}
