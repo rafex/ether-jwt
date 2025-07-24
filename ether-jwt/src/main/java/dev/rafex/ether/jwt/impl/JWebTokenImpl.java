@@ -337,9 +337,30 @@ public final class JWebTokenImpl implements JWebToken {
             return this;
         }
 
+        public Builder expirationPlusHours(final int hours) {
+            if (hours > 0) {
+                payload.put("exp", NOW.plusHours(hours).toEpochSecond(ZoneOffset.UTC));
+            }
+            return this;
+        }
+
+        public Builder expirationPlusMinutes(final int minutes) {
+            if (minutes > 0) {
+                payload.put("exp", NOW.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC));
+            }
+            return this;
+        }
+
         public Builder notBefore(final long notBefore) {
-            if (notBefore > 0) {
+            if (notBefore > 0L) {
                 payload.put("nbf", notBefore);
+            }
+            return this;
+        }
+
+        public Builder notBeforePlusSeconds(final int seconds) {
+            if (seconds > 0) {
+                payload.put("nbf", NOW.plusSeconds(seconds).toEpochSecond(ZoneOffset.UTC));
             }
             return this;
         }
