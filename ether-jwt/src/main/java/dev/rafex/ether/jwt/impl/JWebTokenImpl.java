@@ -26,17 +26,10 @@ package dev.rafex.ether.jwt.impl;
  * #L%
  */
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyFactory;
-// Removed MessageDigest, NoSuchAlgorithmException, InvalidKeyException imports as unused
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
@@ -49,6 +42,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -57,82 +53,85 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import dev.rafex.ether.json.JsonUtils;
 import dev.rafex.ether.jwt.JWebToken;
 
+/**
+ * HMAC-SHA256 JSON Web Token implementation.
+ */
 public final class JWebTokenImpl implements JWebToken {
 
     private static final Logger LOGGER = Logger.getLogger(JWebTokenImpl.class.getName());
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private static final String JWT_HEADER_HS = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
-    private static final String JWT_HEADER_RS = "{\"alg\":\"RS256\",\"typ\":\"JWT\"}";
-    public static final String JWT_PROPERTIES = "jwt.properties";
-    public static final String PRIVATE_KEY_PATH_PROP = "privateKeyPath";
-    public static final String PUBLIC_KEY_PATH_PROP = "publicKeyPath";
-    public static Properties PROPERTIES;
-    private static String SECRET_KEY;
+    private static final String JWT_PROPERTIES = "jwt.properties";
+    private static final String PRIVATE_KEY_PATH_PROP = "privateKeyPath";
+    private static final String PUBLIC_KEY_PATH_PROP = "publicKeyPath";
+    private static final String SECRET_PROP = "secret";
+    private static final Properties PROPS = new Properties();
+    private static final String SECRET;
 
     private static PrivateKey PRIVATE_KEY;
     private static PublicKey PUBLIC_KEY;
+
     private static boolean USE_RSA = false;
 
-    private JsonNode payload;
-    private String signature;
-    private String encodedHeader;
-
     static {
-        try {
-            // load secret or keys
-            loadProperties(JWT_PROPERTIES, PROPERTIES);
-            SECRET_KEY = PROPERTIES.getProperty("secret", UUID.randomUUID().toString());
-            // try load RSA keys
-            String privPath = PROPERTIES.getProperty(PRIVATE_KEY_PATH_PROP);
-            String pubPath = PROPERTIES.getProperty(PUBLIC_KEY_PATH_PROP);
-            if (privPath != null && pubPath != null) {
-                KeyFactory kf = KeyFactory.getInstance("RSA");
-                byte[] privBytes = stripPem(new String(Files.readAllBytes(Paths.get(privPath)), StandardCharsets.UTF_8));
-                PRIVATE_KEY = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
-                byte[] pubBytes = stripPem(new String(Files.readAllBytes(Paths.get(pubPath)), StandardCharsets.UTF_8));
-                PUBLIC_KEY = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
-                USE_RSA = true;
-                LOGGER.info("JWT using RSA (RS256) signing");
-            } else {
-                LOGGER.info("JWT using HMAC (HS256) signing");
+        String key = null;
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream in = loader.getResourceAsStream(JWT_PROPERTIES)) {
+            if (in != null) {
+                PROPS.load(in);
+                key = PROPS.getProperty(SECRET_PROP);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "[WARN] Error initializing JWT keys: ", e);
+            LOGGER.log(Level.WARNING, "Error loading jwt.properties", e);
         }
+        if (key == null || key.isBlank()) {
+            key = UUID.randomUUID().toString();
+        }
+        SECRET = key;
+        // Try load RSA keys from classpath if configured
+        String privRes = PROPS.getProperty(PRIVATE_KEY_PATH_PROP);
+        String pubRes = PROPS.getProperty(PUBLIC_KEY_PATH_PROP);
+        if (privRes != null && pubRes != null) {
+            try (InputStream pin = loader.getResourceAsStream(privRes);
+                 InputStream pub = loader.getResourceAsStream(pubRes)) {
+                if (pin != null && pub != null) {
+                    byte[] privBytes = stripPem(new String(pin.readAllBytes(), StandardCharsets.UTF_8));
+                    byte[] pubBytes = stripPem(new String(pub.readAllBytes(), StandardCharsets.UTF_8));
+                    var kf = java.security.KeyFactory.getInstance("RSA");
+                    PRIVATE_KEY = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
+                    PUBLIC_KEY = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
+                    USE_RSA = true;
+                    LOGGER.info("JWT initialized with RSA (RS256)");
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Error loading RSA keys, fallback to HMAC", e);
+                USE_RSA = false;
+            }
+        }
+        if (!USE_RSA) {
+            LOGGER.info("JWT using HMAC (HS256)");
+        }
+    }
+
+    private final JsonNode payload;
+    private final String signature;
+    private final String encodedHeader;
+
+    private JWebTokenImpl(JsonNode payload, String encodedHeader, String signature) {
+        this.payload = payload;
+        this.encodedHeader = encodedHeader;
+        this.signature = signature;
     }
 
     /**
-     * Encode JWT header based on configured algorithm (HS256 or RS256).
+     * Parse an existing JWT token string.
      */
-    private String encodeHeader() {
-        String headerJson = USE_RSA ? JWT_HEADER_RS : JWT_HEADER_HS;
-        return Base64.getUrlEncoder().withoutPadding()
-            .encodeToString(headerJson.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private JWebTokenImpl() {
-        this.encodedHeader = encodeHeader();
-    }
-
-    private JWebTokenImpl(final Builder builder) throws Exception {
-        this();
-        this.payload = builder.payload;
-        String data = encodedHeader + "." + encode(payload);
-        this.signature = signData(data);
-    }
-
-    public JWebTokenImpl(final String token) throws Exception {
-        this();
+    public JWebTokenImpl(String token) {
         String[] parts = token.split("\\.");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid Token format");
+            throw new IllegalArgumentException("Invalid JWT format");
         }
         this.encodedHeader = parts[0];
         this.payload = JsonUtils.parseTree(decode(parts[1]));
-        if (!payload.has("exp")) {
-            throw new IllegalArgumentException("Payload missing expiration: " + payload);
-        }
         this.signature = parts[2];
     }
 
@@ -155,8 +154,8 @@ public final class JWebTokenImpl implements JWebToken {
     public List<String> getAudience() {
         List<String> list = new ArrayList<>();
         if (payload.has("aud") && payload.get("aud").isArray()) {
-            ArrayNode aud = (ArrayNode) payload.get("aud");
-            aud.forEach(node -> list.add(node.asText()));
+            ArrayNode arr = (ArrayNode) payload.get("aud");
+            arr.forEach(n -> list.add(n.asText()));
         }
         return list;
     }
@@ -200,46 +199,22 @@ public final class JWebTokenImpl implements JWebToken {
     public boolean isValid() {
         try {
             long now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-            if (payload.has("nbf") && payload.get("nbf").asLong() > now) {
-                return false;
-            }
-            if (payload.get("exp").asLong() <= now) {
-                return false;
-            }
-            String data = encodedHeader + "." + encode(payload);
+            if (payload.has("nbf") && payload.get("nbf").asLong() > now) return false;
+            if (!payload.has("exp") || payload.get("exp").asLong() <= now) return false;
+            String body = encode(payload);
+            String data = encodedHeader + "." + body;
             if (USE_RSA) {
-                Signature sig = Signature.getInstance("SHA256withRSA");
+                java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
                 sig.initVerify(PUBLIC_KEY);
                 sig.update(data.getBytes(StandardCharsets.UTF_8));
                 return sig.verify(Base64.getUrlDecoder().decode(signature));
             } else {
-                return signature.equals(hmacSha256(data, SECRET_KEY));
+                String expected = signData(data);
+                return expected.equals(signature);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "[WARN] Error validating token: ", e);
+            LOGGER.log(Level.WARNING, "Error validating JWT", e);
             return false;
-        }
-    }
-
-    private String signData(String data) throws Exception {
-        if (USE_RSA) {
-            Signature sig = Signature.getInstance("SHA256withRSA");
-            sig.initSign(PRIVATE_KEY);
-            sig.update(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(sig.sign());
-        }
-        return hmacSha256(data, SECRET_KEY);
-    }
-
-    private String hmacSha256(final String data, final String secret) {
-        try {
-            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
-            mac.init(new javax.crypto.spec.SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return null;
         }
     }
 
@@ -253,127 +228,106 @@ public final class JWebTokenImpl implements JWebToken {
         return encodedHeader + "." + encode(payload) + "." + signature;
     }
 
-    private static String encode(JsonNode node) {
-        return encode(node.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
     private static String encode(byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private static String decode(final String encoded) {
-        return new String(Base64.getUrlDecoder().decode(encoded), StandardCharsets.UTF_8);
+    private static String encode(JsonNode node) {
+        return encode(node.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    private static byte[] stripPem(String pem) {
-        String base64 = pem.replaceAll("-----BEGIN [^\r\n]+-----", "")
-                           .replaceAll("-----END [^\r\n]+-----", "")
-                           .replaceAll("\s+", "");
-        return Base64.getDecoder().decode(base64);
+    private static String decode(String s) {
+        return new String(Base64.getUrlDecoder().decode(s), StandardCharsets.UTF_8);
     }
 
-    static boolean loadProperties(final String resourceName, final Properties props) {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL testProps = loader.getResource(resourceName);
-        if (testProps != null) {
-            try (InputStream in = testProps.openStream()) {
-                PROPERTIES = new Properties();
-                PROPERTIES.load(in);
-                return true;
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "[WARN] Error loading properties config: ", e);
-            }
+    private static String signData(String data) throws Exception {
+        if (USE_RSA) {
+            java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
+            sig.initSign(PRIVATE_KEY);
+            sig.update(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(sig.sign());
+        } else {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         }
-        return false;
     }
 
-    public static final class Builder {
-        private final ObjectNode payload;
-        private final LocalDateTime NOW = LocalDateTime.now();
+    private static String getHeaderJson() {
+        return USE_RSA
+            ? "{\"alg\":\"RS256\",\"typ\":\"JWT\"}"
+            : "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+    }
+
+    /** Builder for creating JWT tokens. */
+    public static class Builder {
+        private final ObjectNode payload = MAPPER.createObjectNode();
+        private final LocalDateTime now = LocalDateTime.now();
 
         public Builder() {
-            payload = MAPPER.createObjectNode();
             payload.put("iss", "rafex.dev");
             payload.put("jti", UUID.randomUUID().toString());
-            payload.put("iat", NOW.toEpochSecond(ZoneOffset.UTC));
+            payload.put("iat", now.toEpochSecond(ZoneOffset.UTC));
         }
 
-        public Builder issuer(final String issuer) {
-            if (issuer != null && !issuer.isBlank()) {
-                payload.put("iss", issuer);
-            }
+        public Builder issuer(String iss) {
+            if (iss != null && !iss.isBlank()) payload.put("iss", iss);
             return this;
         }
 
-        public Builder subject(final String subject) {
-            if (subject != null && !subject.isBlank()) {
-                payload.put("sub", subject);
-            }
+        public Builder subject(String sub) {
+            if (sub != null && !sub.isBlank()) payload.put("sub", sub);
             return this;
         }
 
-        public Builder audience(final String[] audience) {
-            if (audience != null && audience.length > 0) {
+        public Builder audience(String... aud) {
+            if (aud != null && aud.length > 0) {
                 ArrayNode arr = MAPPER.createArrayNode();
-                for (String s : audience) {
-                    arr.add(s);
-                }
+                for (String s : aud) arr.add(s);
                 payload.set("aud", arr);
             }
             return this;
         }
 
-        public Builder expiration(final long expiration) {
-            if (expiration > 0) {
-                payload.put("exp", expiration);
-            }
+        public Builder expiration(long exp) {
+            if (exp > 0) payload.put("exp", exp);
             return this;
         }
 
-        public Builder expirationPlusDays(final int days) {
-            if (days > 0) {
-                payload.put("exp", NOW.plusDays(days).toEpochSecond(ZoneOffset.UTC));
-            }
+        public Builder expirationPlusMinutes(int mins) {
+            if (mins > 0) payload.put("exp", now.plusMinutes(mins).toEpochSecond(ZoneOffset.UTC));
             return this;
         }
 
-        public Builder expirationPlusHours(final int hours) {
-            if (hours > 0) {
-                payload.put("exp", NOW.plusHours(hours).toEpochSecond(ZoneOffset.UTC));
-            }
+        public Builder notBeforePlusSeconds(int secs) {
+            if (secs > 0) payload.put("nbf", now.plusSeconds(secs).toEpochSecond(ZoneOffset.UTC));
             return this;
         }
 
-        public Builder expirationPlusMinutes(final int minutes) {
-            if (minutes > 0) {
-                payload.put("exp", NOW.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC));
-            }
-            return this;
-        }
-
-        public Builder notBefore(final long notBefore) {
-            if (notBefore > 0L) {
-                payload.put("nbf", notBefore);
-            }
-            return this;
-        }
-
-        public Builder notBeforePlusSeconds(final int seconds) {
-            if (seconds > 0) {
-                payload.put("nbf", NOW.plusSeconds(seconds).toEpochSecond(ZoneOffset.UTC));
-            }
-            return this;
-        }
-
-        public Builder claim(final String property, final String value) {
-            if (property != null && !property.isBlank() && value != null && !value.isBlank()) {
-                payload.put(property, value);
-            }
+        public Builder claim(String key, String val) {
+            if (key != null && !key.isBlank() && val != null && !val.isBlank()) payload.put(key, val);
             return this;
         }
 
         public JWebTokenImpl build() throws Exception {
-            return new JWebTokenImpl(this);
+            String header = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(getHeaderJson().getBytes(StandardCharsets.UTF_8));
+            String body = encode(payload);
+            String sig = signData(header + "." + body);
+            JsonNode pl = JsonUtils.parseTree(body);
+            return new JWebTokenImpl(pl, header, sig);
         }
+    }
+
+    private static byte[] stripPem(String pem) {
+        // remove PEM headers/footers and whitespace
+        String[] lines = pem
+            .replaceAll("-----BEGIN (.*)-----", "")
+            .replaceAll("-----END (.*)-----", "")
+            .split("\\r?\\n");
+        StringBuilder sb = new StringBuilder();
+        for (String line : lines) sb.append(line.trim());
+        return Base64.getDecoder().decode(sb.toString());
     }
 }
