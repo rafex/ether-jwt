@@ -8,3 +8,18 @@ target/
 .classpath
 .project
 .idea/
+
+target/
+.project
+.settings/
+release.properties
+pom.xml.releaseBackup
+pom.xml.next
+pom.xml.tag
+pom.xml.branch
+pom.xml.backup
+pom.xml.versionsBackup
+# Allow the Maven Wrapper itself
+!.mvn/wrapper/maven-wrapper.jar
+*.jar
+*.war
