@@ -3,3 +3,4 @@ PROJECT_DIR := ether-jwt
 
 # Include shared build logic
 include ../build-helpers/common.mk
+include ../build-helpers/git.mk
