@@ -52,6 +52,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dev.rafex.ether.json.JsonUtils;
 import dev.rafex.ether.jwt.JWebToken;
+import dev.rafex.ether.jwt.enums.AlgorithmType;
+import dev.rafex.ether.jwt.enums.SignType;
 
 /**
  * HMAC-SHA256 JSON Web Token implementation.
@@ -242,13 +244,13 @@ public final class JWebTokenImpl implements JWebToken {
 
     private static String signData(String data) throws Exception {
         if (USE_RSA) {
-            java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
+            java.security.Signature sig = java.security.Signature.getInstance(SignType.SHA256WITHRSA.getValue());
             sig.initSign(PRIVATE_KEY);
             sig.update(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(sig.sign());
         } else {
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            Mac mac = Mac.getInstance(SignType.HMACSHA256.getValue());
+            mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), SignType.HMACSHA256.getValue()));
             byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         }
@@ -256,8 +258,8 @@ public final class JWebTokenImpl implements JWebToken {
 
     private static String getHeaderJson() {
         return USE_RSA
-            ? "{\"alg\":\"RS256\",\"typ\":\"JWT\"}"
-            : "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+            ? AlgorithmType.RS256.getHeader()
+            : AlgorithmType.HS256.getHeader();
     }
 
     /** Builder for creating JWT tokens. */
@@ -315,7 +317,7 @@ public final class JWebTokenImpl implements JWebToken {
                 .encodeToString(getHeaderJson().getBytes(StandardCharsets.UTF_8));
             String body = encode(payload);
             String sig = signData(header + "." + body);
-            JsonNode pl = JsonUtils.parseTree(body);
+            JsonNode pl = payload;
             return new JWebTokenImpl(pl, header, sig);
         }
     }
