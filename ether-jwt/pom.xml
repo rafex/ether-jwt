@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>dev.rafex.ether.parent</groupId>
 		<artifactId>ether-parent</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.6-v20250724</version>
 	</parent>
 
 	<groupId>dev.rafex.ether.jwt</groupId>
