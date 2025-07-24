@@ -1,5 +1,7 @@
 package dev.rafex.ether.jwt.impl;
 
+import java.io.FileInputStream;
+
 /*-
  * #%L
  * ether-jwt
@@ -12,10 +14,10 @@ package dev.rafex.ether.jwt.impl;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +30,8 @@ package dev.rafex.ether.jwt.impl;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -63,10 +67,21 @@ public final class JWebTokenImpl implements JWebToken {
     private static final Logger LOGGER = Logger.getLogger(JWebTokenImpl.class.getName());
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String JWT_PROPERTIES = "jwt.properties";
-    private static final String PRIVATE_KEY_PATH_PROP = "privateKeyPath";
-    private static final String PUBLIC_KEY_PATH_PROP = "publicKeyPath";
-    private static final String SECRET_PROP = "secret";
+    private static final String PRIVATE_KEY_PATH_PROP = "jwt.privateKeyPath";
+    private static final String PUBLIC_KEY_PATH_PROP = "jwt.publicKeyPath";
+    private static final String SECRET_PROP = "jwt.secret";
     private static final Properties PROPS = new Properties();
+
+    static {
+        // Override from system properties if present
+        for (String p : new String[]{SECRET_PROP, PRIVATE_KEY_PATH_PROP, PUBLIC_KEY_PATH_PROP}) {
+            String sys = System.getProperty(p);
+            if (sys != null && !sys.isBlank()) {
+                PROPS.setProperty(p, sys);
+            }
+        }
+    }
+
     private static final String SECRET;
 
     private static PrivateKey PRIVATE_KEY;
@@ -76,35 +91,58 @@ public final class JWebTokenImpl implements JWebToken {
 
     static {
         String key = null;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try (InputStream in = loader.getResourceAsStream(JWT_PROPERTIES)) {
+        final var loader = Thread.currentThread().getContextClassLoader();
+        InputStream in = null;
+        try {
+            // First attempt to load from classpath
+            in = loader.getResourceAsStream(JWT_PROPERTIES);
+            if (in == null) {
+                // Fallback: load from src/main/resources directory on file system
+                final var propFile = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", JWT_PROPERTIES);
+                if (Files.exists(propFile)) {
+                    in = new FileInputStream(propFile.toFile());
+                }
+            }
             if (in != null) {
                 PROPS.load(in);
-                key = PROPS.getProperty(SECRET_PROP);
+            } else {
+                LOGGER.info("jwt.properties not found on classpath or file system, using default secret");
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.log(Level.WARNING, "Error loading jwt.properties", e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (final Exception ignore) {
+                }
+            }
         }
+        // After loading properties from file, re-apply system properties overrides
+        for (String p : new String[]{SECRET_PROP, PRIVATE_KEY_PATH_PROP, PUBLIC_KEY_PATH_PROP}) {
+            String sys = System.getProperty(p);
+            if (sys != null && !sys.isBlank()) {
+                PROPS.setProperty(p, sys);
+            }
+        }
+        key = PROPS.getProperty(SECRET_PROP);
         if (key == null || key.isBlank()) {
             key = UUID.randomUUID().toString();
         }
         SECRET = key;
-        // Try load RSA keys from classpath if configured
-        String privRes = PROPS.getProperty(PRIVATE_KEY_PATH_PROP);
-        String pubRes = PROPS.getProperty(PUBLIC_KEY_PATH_PROP);
+        // Try load RSA keys from filesystem if configured
+        final var privRes = PROPS.getProperty(PRIVATE_KEY_PATH_PROP);
+        final var pubRes = PROPS.getProperty(PUBLIC_KEY_PATH_PROP);
         if (privRes != null && pubRes != null) {
-            try (InputStream pin = loader.getResourceAsStream(privRes);
-                 InputStream pub = loader.getResourceAsStream(pubRes)) {
-                if (pin != null && pub != null) {
-                    byte[] privBytes = stripPem(new String(pin.readAllBytes(), StandardCharsets.UTF_8));
-                    byte[] pubBytes = stripPem(new String(pub.readAllBytes(), StandardCharsets.UTF_8));
-                    var kf = java.security.KeyFactory.getInstance("RSA");
-                    PRIVATE_KEY = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
-                    PUBLIC_KEY = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
-                    USE_RSA = true;
-                    LOGGER.info("JWT initialized with RSA (RS256)");
-                }
-            } catch (Exception e) {
+            try (InputStream pin = new FileInputStream(privRes); InputStream pub = new FileInputStream(pubRes)) {
+                final var privBytes = stripPem(new String(pin.readAllBytes(), StandardCharsets.UTF_8));
+                final var pubBytes = stripPem(new String(pub.readAllBytes(), StandardCharsets.UTF_8));
+                final var kf = java.security.KeyFactory.getInstance("RSA");
+                PRIVATE_KEY = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
+                PUBLIC_KEY = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
+                USE_RSA = true;
+                LOGGER.info("JWT initialized with RSA (RS256)");
+            } catch (final Exception e) {
                 LOGGER.log(Level.WARNING, "Error loading RSA keys, fallback to HMAC", e);
                 USE_RSA = false;
             }
@@ -118,7 +156,7 @@ public final class JWebTokenImpl implements JWebToken {
     private final String signature;
     private final String encodedHeader;
 
-    private JWebTokenImpl(JsonNode payload, String encodedHeader, String signature) {
+    private JWebTokenImpl(final JsonNode payload, final String encodedHeader, final String signature) {
         this.payload = payload;
         this.encodedHeader = encodedHeader;
         this.signature = signature;
@@ -127,14 +165,14 @@ public final class JWebTokenImpl implements JWebToken {
     /**
      * Parse an existing JWT token string.
      */
-    public JWebTokenImpl(String token) {
-        String[] parts = token.split("\\.");
+    public JWebTokenImpl(final String token) {
+        final var parts = token.split("\\.");
         if (parts.length != 3) {
             throw new IllegalArgumentException("Invalid JWT format");
         }
-        this.encodedHeader = parts[0];
-        this.payload = JsonUtils.parseTree(decode(parts[1]));
-        this.signature = parts[2];
+        encodedHeader = parts[0];
+        payload = JsonUtils.parseTree(decode(parts[1]));
+        signature = parts[2];
     }
 
     @Override
@@ -154,9 +192,9 @@ public final class JWebTokenImpl implements JWebToken {
 
     @Override
     public List<String> getAudience() {
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
         if (payload.has("aud") && payload.get("aud").isArray()) {
-            ArrayNode arr = (ArrayNode) payload.get("aud");
+            final var arr = (ArrayNode) payload.get("aud");
             arr.forEach(n -> list.add(n.asText()));
         }
         return list;
@@ -183,7 +221,7 @@ public final class JWebTokenImpl implements JWebToken {
     }
 
     @Override
-    public String get(String property) {
+    public String get(final String property) {
         return payload.has(property) ? payload.get(property).asText() : "";
     }
 
@@ -200,21 +238,21 @@ public final class JWebTokenImpl implements JWebToken {
     @Override
     public boolean isValid() {
         try {
-            long now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-            if (payload.has("nbf") && payload.get("nbf").asLong() > now) return false;
-            if (!payload.has("exp") || payload.get("exp").asLong() <= now) return false;
-            String body = encode(payload);
-            String data = encodedHeader + "." + body;
+            final var now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+            if ((payload.has("nbf") && payload.get("nbf").asLong() > now) || !payload.has("exp") || payload.get("exp").asLong() <= now) {
+                return false;
+            }
+            final var body = encode(payload);
+            final var data = encodedHeader + "." + body;
             if (USE_RSA) {
-                java.security.Signature sig = java.security.Signature.getInstance("SHA256withRSA");
+                final var sig = java.security.Signature.getInstance("SHA256withRSA");
                 sig.initVerify(PUBLIC_KEY);
                 sig.update(data.getBytes(StandardCharsets.UTF_8));
                 return sig.verify(Base64.getUrlDecoder().decode(signature));
-            } else {
-                String expected = signData(data);
-                return expected.equals(signature);
             }
-        } catch (Exception e) {
+            final var expected = signData(data);
+            return expected.equals(signature);
+        } catch (final Exception e) {
             LOGGER.log(Level.WARNING, "Error validating JWT", e);
             return false;
         }
@@ -230,36 +268,33 @@ public final class JWebTokenImpl implements JWebToken {
         return encodedHeader + "." + encode(payload) + "." + signature;
     }
 
-    private static String encode(byte[] bytes) {
+    private static String encode(final byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private static String encode(JsonNode node) {
+    private static String encode(final JsonNode node) {
         return encode(node.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    private static String decode(String s) {
+    private static String decode(final String s) {
         return new String(Base64.getUrlDecoder().decode(s), StandardCharsets.UTF_8);
     }
 
-    private static String signData(String data) throws Exception {
+    private static String signData(final String data) throws Exception {
         if (USE_RSA) {
-            java.security.Signature sig = java.security.Signature.getInstance(SignType.SHA256WITHRSA.getValue());
+            final var sig = java.security.Signature.getInstance(SignType.SHA256WITHRSA.getValue());
             sig.initSign(PRIVATE_KEY);
             sig.update(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(sig.sign());
-        } else {
-            Mac mac = Mac.getInstance(SignType.HMACSHA256.getValue());
-            mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), SignType.HMACSHA256.getValue()));
-            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         }
+        final var mac = Mac.getInstance(SignType.HMACSHA256.getValue());
+        mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), SignType.HMACSHA256.getValue()));
+        final var hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
     }
 
     private static String getHeaderJson() {
-        return USE_RSA
-            ? AlgorithmType.RS256.getHeader()
-            : AlgorithmType.HS256.getHeader();
+        return USE_RSA ? AlgorithmType.RS256.getHeader() : AlgorithmType.HS256.getHeader();
     }
 
     /** Builder for creating JWT tokens. */
@@ -273,63 +308,75 @@ public final class JWebTokenImpl implements JWebToken {
             payload.put("iat", now.toEpochSecond(ZoneOffset.UTC));
         }
 
-        public Builder issuer(String iss) {
-            if (iss != null && !iss.isBlank()) payload.put("iss", iss);
+        public Builder issuer(final String iss) {
+            if (iss != null && !iss.isBlank()) {
+                payload.put("iss", iss);
+            }
             return this;
         }
 
-        public Builder subject(String sub) {
-            if (sub != null && !sub.isBlank()) payload.put("sub", sub);
+        public Builder subject(final String sub) {
+            if (sub != null && !sub.isBlank()) {
+                payload.put("sub", sub);
+            }
             return this;
         }
 
-        public Builder audience(String... aud) {
+        public Builder audience(final String... aud) {
             if (aud != null && aud.length > 0) {
-                ArrayNode arr = MAPPER.createArrayNode();
-                for (String s : aud) arr.add(s);
+                final var arr = MAPPER.createArrayNode();
+                for (final String s : aud) {
+                    arr.add(s);
+                }
                 payload.set("aud", arr);
             }
             return this;
         }
 
-        public Builder expiration(long exp) {
-            if (exp > 0) payload.put("exp", exp);
+        public Builder expiration(final long exp) {
+            if (exp > 0) {
+                payload.put("exp", exp);
+            }
             return this;
         }
 
-        public Builder expirationPlusMinutes(int mins) {
-            if (mins > 0) payload.put("exp", now.plusMinutes(mins).toEpochSecond(ZoneOffset.UTC));
+        public Builder expirationPlusMinutes(final int mins) {
+            if (mins > 0) {
+                payload.put("exp", now.plusMinutes(mins).toEpochSecond(ZoneOffset.UTC));
+            }
             return this;
         }
 
-        public Builder notBeforePlusSeconds(int secs) {
-            if (secs > 0) payload.put("nbf", now.plusSeconds(secs).toEpochSecond(ZoneOffset.UTC));
+        public Builder notBeforePlusSeconds(final int secs) {
+            if (secs > 0) {
+                payload.put("nbf", now.plusSeconds(secs).toEpochSecond(ZoneOffset.UTC));
+            }
             return this;
         }
 
-        public Builder claim(String key, String val) {
-            if (key != null && !key.isBlank() && val != null && !val.isBlank()) payload.put(key, val);
+        public Builder claim(final String key, final String val) {
+            if (key != null && !key.isBlank() && val != null && !val.isBlank()) {
+                payload.put(key, val);
+            }
             return this;
         }
 
         public JWebTokenImpl build() throws Exception {
-            String header = Base64.getUrlEncoder().withoutPadding()
-                .encodeToString(getHeaderJson().getBytes(StandardCharsets.UTF_8));
-            String body = encode(payload);
-            String sig = signData(header + "." + body);
-            JsonNode pl = payload;
+            final var header = Base64.getUrlEncoder().withoutPadding().encodeToString(getHeaderJson().getBytes(StandardCharsets.UTF_8));
+            final var body = encode(payload);
+            final var sig = signData(header + "." + body);
+            final JsonNode pl = payload;
             return new JWebTokenImpl(pl, header, sig);
         }
     }
 
-    private static byte[] stripPem(String pem) {
+    private static byte[] stripPem(final String pem) {
         // remove PEM headers/footers and whitespace
-        String[] lines = pem
-            .replaceAll("-----BEGIN (.*)-----", "")
-            .replaceAll("-----END (.*)-----", "")
-            .split("\\r?\\n");
-        StringBuilder sb = new StringBuilder();
-        for (String line : lines) sb.append(line.trim());
+        final var lines = pem.replaceAll("-----BEGIN (.*)-----", "").replaceAll("-----END (.*)-----", "").split("\\r?\\n");
+        final var sb = new StringBuilder();
+        for (final String line : lines) {
+            sb.append(line.trim());
+        }
         return Base64.getDecoder().decode(sb.toString());
     }
 }
