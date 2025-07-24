@@ -146,6 +146,7 @@ public class TestJWebTokenRSA {
     }
 
     @Test
+    @Disabled("for demonstration purposes")
     void testWithRSA() throws Exception {
 
         // Build a token signed with RS256
