@@ -1,4 +1,4 @@
-package dev.rafex.ether.jwt;
+package dev.rafex.ether.jwt.enums;
 
 /*-
  * #%L
@@ -26,37 +26,17 @@ package dev.rafex.ether.jwt;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.JsonNode;
+public enum SignType {
 
-import java.util.List;
-
-
-public interface JWebToken {
-
-    JsonNode getPayload();
-
-    String getIssuer();
-
-    String getSubject();
-
-    List<String> getAudience();
-
-    Long getExpiration();
-
-    Long getNotBefore();
-
-    Long getIssuedAt();
-
-    String getJwtId();
-
-    String get(String property);
-
-    String getSignature();
-
-    String getEncodedHeader();
-
-    boolean isValid();
-
-    String aJson();
-
+    HMACSHA256("HmacSHA256"), SHA256WITHRSA("SHA256withRSA"), SHA256WITHRSAPSS("SHA256withRSAPSS") ;
+    
+    private final String value;
+    
+    SignType(String value) {
+        this.value = value;
+    }
+    
+    public String getValue() {
+        return value;
+    }
 }

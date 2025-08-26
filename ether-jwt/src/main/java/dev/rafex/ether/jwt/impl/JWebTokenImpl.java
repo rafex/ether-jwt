@@ -1,189 +1,41 @@
-/**
- * 	Copyright (C) August 2019 Raúl Eduardo González Argote - rafex@rafex.dev
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by
- * the Free Software Foundation, version 3, 29 June 2007
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- *                   GNU LESSER GENERAL PUBLIC LICENSE
- *                        Version 3, 29 June 2007
- *
- *  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *
- *   This version of the GNU Lesser General Public License incorporates
- * the terms and conditions of version 3 of the GNU General Public
- * License, supplemented by the additional permissions listed below.
- *
- *   0. Additional Definitions.
- *
- *   As used herein, "this License" refers to version 3 of the GNU Lesser
- * General Public License, and the "GNU GPL" refers to version 3 of the GNU
- * General Public License.
- *
- *   "The Library" refers to a covered work governed by this License,
- * other than an Application or a Combined Work as defined below.
- *
- *   An "Application" is any work that makes use of an interface provided
- * by the Library, but which is not otherwise based on the Library.
- * Defining a subclass of a class defined by the Library is deemed a mode
- * of using an interface provided by the Library.
- *
- *   A "Combined Work" is a work produced by combining or linking an
- * Application with the Library.  The particular version of the Library
- * with which the Combined Work was made is also called the "Linked
- * Version".
- *
- *   The "Minimal Corresponding Source" for a Combined Work means the
- * Corresponding Source for the Combined Work, excluding any source code
- * for portions of the Combined Work that, considered in isolation, are
- * based on the Application, and not on the Linked Version.
- *
- *   The "Corresponding Application Code" for a Combined Work means the
- * object code and/or source code for the Application, including any data
- * and utility programs needed for reproducing the Combined Work from the
- * Application, but excluding the System Libraries of the Combined Work.
- *
- *   1. Exception to Section 3 of the GNU GPL.
- *
- *   You may convey a covered work under sections 3 and 4 of this License
- * without being bound by section 3 of the GNU GPL.
- *
- *   2. Conveying Modified Versions.
- *
- *   If you modify a copy of the Library, and, in your modifications, a
- * facility refers to a function or data to be supplied by an Application
- * that uses the facility (other than as an argument passed when the
- * facility is invoked), then you may convey a copy of the modified
- * version:
- *
- *    a) under this License, provided that you make a good faith effort to
- *    ensure that, in the event an Application does not supply the
- *    function or data, the facility still operates, and performs
- *    whatever part of its purpose remains meaningful, or
- *
- *    b) under the GNU GPL, with none of the additional permissions of
- *    this License applicable to that copy.
- *
- *   3. Object Code Incorporating Material from Library Header Files.
- *
- *   The object code form of an Application may incorporate material from
- * a header file that is part of the Library.  You may convey such object
- * code under terms of your choice, provided that, if the incorporated
- * material is not limited to numerical parameters, data structure
- * layouts and accessors, or small macros, inline functions and templates
- * (ten or fewer lines in length), you do both of the following:
- *
- *    a) Give prominent notice with each copy of the object code that the
- *    Library is used in it and that the Library and its use are
- *    covered by this License.
- *
- *    b) Accompany the object code with a copy of the GNU GPL and this license
- *    document.
- *
- *   4. Combined Works.
- *
- *   You may convey a Combined Work under terms of your choice that,
- * taken together, effectively do not restrict modification of the
- * portions of the Library contained in the Combined Work and reverse
- * engineering for debugging such modifications, if you also do each of
- * the following:
- *
- *    a) Give prominent notice with each copy of the Combined Work that
- *    the Library is used in it and that the Library and its use are
- *    covered by this License.
- *
- *    b) Accompany the Combined Work with a copy of the GNU GPL and this license
- *    document.
- *
- *    c) For a Combined Work that displays copyright notices during
- *    execution, include the copyright notice for the Library among
- *    these notices, as well as a reference directing the user to the
- *    copies of the GNU GPL and this license document.
- *
- *    d) Do one of the following:
- *
- *        0) Convey the Minimal Corresponding Source under the terms of this
- *        License, and the Corresponding Application Code in a form
- *        suitable for, and under terms that permit, the user to
- *        recombine or relink the Application with a modified version of
- *        the Linked Version to produce a modified Combined Work, in the
- *        manner specified by section 6 of the GNU GPL for conveying
- *        Corresponding Source.
- *
- *        1) Use a suitable shared library mechanism for linking with the
- *        Library.  A suitable mechanism is one that (a) uses at run time
- *        a copy of the Library already present on the user's computer
- *        system, and (b) will operate properly with a modified version
- *        of the Library that is interface-compatible with the Linked
- *        Version.
- *
- *    e) Provide Installation Information, but only if you would otherwise
- *    be required to provide such information under section 6 of the
- *    GNU GPL, and only to the extent that such information is
- *    necessary to install and execute a modified version of the
- *    Combined Work produced by recombining or relinking the
- *    Application with a modified version of the Linked Version. (If
- *    you use option 4d0, the Installation Information must accompany
- *    the Minimal Corresponding Source and Corresponding Application
- *    Code. If you use option 4d1, you must provide the Installation
- *    Information in the manner specified by section 6 of the GNU GPL
- *    for conveying Corresponding Source.)
- *
- *   5. Combined Libraries.
- *
- *   You may place library facilities that are a work based on the
- * Library side by side in a single library together with other library
- * facilities that are not Applications and are not covered by this
- * License, and convey such a combined library under terms of your
- * choice, if you do both of the following:
- *
- *    a) Accompany the combined library with a copy of the same work based
- *    on the Library, uncombined with any other library facilities,
- *    conveyed under the terms of this License.
- *
- *    b) Give prominent notice with the combined library that part of it
- *    is a work based on the Library, and explaining where to find the
- *    accompanying uncombined form of the same work.
- *
- *   6. Revised Versions of the GNU Lesser General Public License.
- *
- *   The Free Software Foundation may publish revised and/or new versions
- * of the GNU Lesser General Public License from time to time. Such new
- * versions will be similar in spirit to the present version, but may
- * differ in detail to address new problems or concerns.
- *
- *   Each version is given a distinguishing version number. If the
- * Library as you received it specifies that a certain numbered version
- * of the GNU Lesser General Public License "or any later version"
- * applies to it, you have the option of following the terms and
- * conditions either of that published version or of any later version
- * published by the Free Software Foundation. If the Library as you
- * received it does not specify a version number of the GNU Lesser
- * General Public License, you may choose any version of the GNU Lesser
- * General Public License ever published by the Free Software Foundation.
- *
- *   If the Library as you received it specifies that a proxy can decide
- * whether future versions of the GNU Lesser General Public License shall
- * apply, that proxy's public statement of acceptance of any version is
- * permanent authorization for you to choose that version for the
- * Library.
- */
 package dev.rafex.ether.jwt.impl;
 
-import java.io.IOException;
+import java.io.FileInputStream;
+
+/*-
+ * #%L
+ * ether-jwt
+ * %%
+ * Copyright (C) 2025 Raúl Eduardo González Argote
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -197,187 +49,187 @@ import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dev.rafex.ether.json.JsonUtils;
 import dev.rafex.ether.jwt.JWebToken;
+import dev.rafex.ether.jwt.enums.AlgorithmType;
+import dev.rafex.ether.jwt.enums.SignType;
 
+/**
+ * HMAC-SHA256 JSON Web Token implementation.
+ */
 public final class JWebTokenImpl implements JWebToken {
 
-    private final static Logger LOGGER = Logger.getLogger(JWebTokenImpl.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JWebTokenImpl.class.getName());
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String JWT_PROPERTIES = "jwt.properties";
+    private static final String PRIVATE_KEY_PATH_PROP = "jwt.privateKeyPath";
+    private static final String PUBLIC_KEY_PATH_PROP = "jwt.publicKeyPath";
+    private static final String SECRET_PROP = "jwt.secret";
+    private static final Properties PROPS = new Properties();
 
     static {
-        try {
-            LOGGER.info("Load secret key JWT");
-
-            String option = "";
-
-            if (JWebTokenImpl.loadProperties(JWebTokenImpl.JWT_PROPERTIES, JWebTokenImpl.PROPERTIES)) {
-                JWebTokenImpl.SECRET_KEY = JWebTokenImpl.PROPERTIES.getProperty("secret");
-                option = "Properties";
-            } else if (System.getenv(JWebTokenImpl.ENVIRONMENT_JWT_SECRET_KEY) != null) {
-                JWebTokenImpl.SECRET_KEY = JWebTokenImpl.ENVIRONMENT_JWT_SECRET_KEY;
-                option = "Enviroment";
-            } else {
-                JWebTokenImpl.SECRET_KEY = UUID.randomUUID().toString();
-                option = "UUID";
+        // Override from system properties if present
+        for (String p : new String[]{SECRET_PROP, PRIVATE_KEY_PATH_PROP, PUBLIC_KEY_PATH_PROP}) {
+            String sys = System.getProperty(p);
+            if (sys != null && !sys.isBlank()) {
+                PROPS.setProperty(p, sys);
             }
-
-            LOGGER.info("JWT Load option: " + option);
-
-        } catch (final SecurityException e) {
-            LOGGER.log(Level.WARNING, "[WARN] Error loading properties config: ", e);
         }
     }
 
-    private final static String ENVIRONMENT_JWT_SECRET_KEY = "ETHER_ENVIRONMENT_JWT_SECRET_KEY";
-    private static final String JWT_HEADER = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
-    public static final String JWT_PROPERTIES = "jwt.properties";
-    public static Properties PROPERTIES;
-    private static String SECRET_KEY;
+    private static final String SECRET;
 
-    private JsonObject payload;
+    private static PrivateKey PRIVATE_KEY;
+    private static PublicKey PUBLIC_KEY;
 
-    private String signature;
-    private String encodedHeader;
+    private static boolean USE_RSA = false;
 
-    private JWebTokenImpl() {
-        encodedHeader = encode(new Gson().fromJson(JWT_HEADER, JsonObject.class));
+    static {
+        String key = null;
+        final var loader = Thread.currentThread().getContextClassLoader();
+        InputStream in = null;
+        try {
+            // First attempt to load from classpath
+            in = loader.getResourceAsStream(JWT_PROPERTIES);
+            if (in == null) {
+                // Fallback: load from src/main/resources directory on file system
+                final var propFile = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", JWT_PROPERTIES);
+                if (Files.exists(propFile)) {
+                    in = new FileInputStream(propFile.toFile());
+                }
+            }
+            if (in != null) {
+                PROPS.load(in);
+            } else {
+                LOGGER.info("jwt.properties not found on classpath or file system, using default secret");
+            }
+        } catch (final Exception e) {
+            LOGGER.log(Level.WARNING, "Error loading jwt.properties", e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (final Exception ignore) {
+                }
+            }
+        }
+        // After loading properties from file, re-apply system properties overrides
+        for (String p : new String[]{SECRET_PROP, PRIVATE_KEY_PATH_PROP, PUBLIC_KEY_PATH_PROP}) {
+            String sys = System.getProperty(p);
+            if (sys != null && !sys.isBlank()) {
+                PROPS.setProperty(p, sys);
+            }
+        }
+        key = PROPS.getProperty(SECRET_PROP);
+        if (key == null || key.isBlank()) {
+            key = UUID.randomUUID().toString();
+        }
+        SECRET = key;
+        // Try load RSA keys from filesystem if configured
+        final var privRes = PROPS.getProperty(PRIVATE_KEY_PATH_PROP);
+        final var pubRes = PROPS.getProperty(PUBLIC_KEY_PATH_PROP);
+        if (privRes != null && pubRes != null) {
+            try (InputStream pin = new FileInputStream(privRes); InputStream pub = new FileInputStream(pubRes)) {
+                final var privBytes = stripPem(new String(pin.readAllBytes(), StandardCharsets.UTF_8));
+                final var pubBytes = stripPem(new String(pub.readAllBytes(), StandardCharsets.UTF_8));
+                final var kf = java.security.KeyFactory.getInstance("RSA");
+                PRIVATE_KEY = kf.generatePrivate(new PKCS8EncodedKeySpec(privBytes));
+                PUBLIC_KEY = kf.generatePublic(new X509EncodedKeySpec(pubBytes));
+                USE_RSA = true;
+                LOGGER.info("JWT initialized with RSA (RS256)");
+            } catch (final Exception e) {
+                LOGGER.log(Level.WARNING, "Error loading RSA keys, fallback to HMAC", e);
+                USE_RSA = false;
+            }
+        }
+        if (!USE_RSA) {
+            LOGGER.info("JWT using HMAC (HS256)");
+        }
     }
 
-    private JWebTokenImpl(final Builder builder) {
-        this();
-        payload = builder.PAYLOAD;
-        signature = hmacSha256(encodedHeader + "." + encode(payload), SECRET_KEY);
+    private final JsonNode payload;
+    private final String signature;
+    private final String encodedHeader;
+
+    private JWebTokenImpl(final JsonNode payload, final String encodedHeader, final String signature) {
+        this.payload = payload;
+        this.encodedHeader = encodedHeader;
+        this.signature = signature;
     }
 
-//	private JWebToken(final JsonObject payload) {
-//		this(payload.get("sub").getAsString(), payload.get("aud").getAsJsonArray(), payload.get("exp").getAsLong());
-//	}
-
-    public JWebTokenImpl(final String token) throws NoSuchAlgorithmException {
-        this();
-        final String[] parts = token.split("\\.");
+    /**
+     * Parse an existing JWT token string.
+     */
+    public JWebTokenImpl(final String token) {
+        final var parts = token.split("\\.");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid Token format");
-        }
-        if (!encodedHeader.equals(parts[0])) {
-            throw new NoSuchAlgorithmException("JWT Header is Incorrect: " + parts[0]);
+            throw new IllegalArgumentException("Invalid JWT format");
         }
         encodedHeader = parts[0];
-
-//		payload = new JsonObject(decode(parts[1]));
-        payload = new JsonParser().parse(decode(parts[1])).getAsJsonObject();
-        if (payload.isJsonNull()) {
-            throw new JsonIOException("Payload is Empty: ");
-        }
-        if (!payload.has("exp")) {
-            throw new JsonSyntaxException("Payload doesn't contain expiry " + payload);
-        }
+        payload = JsonUtils.parseTree(decode(parts[1]));
         signature = parts[2];
     }
 
-    /**
-     * @return the payload
-     */
     @Override
-    public JsonObject getPayload() {
+    public JsonNode getPayload() {
         return payload;
     }
 
-    /**
-     * @return the issuer
-     */
     @Override
     public String getIssuer() {
-        final String element = "iss";
-        return payload.has(element) ? payload.get(element).getAsString() : "";
+        return payload.has("iss") ? payload.get("iss").asText() : "";
     }
 
-    /**
-     * @return the subject
-     */
     @Override
     public String getSubject() {
-        final String element = "sub";
-        return payload.has(element) ? payload.get(element).getAsString() : "";
+        return payload.has("sub") ? payload.get("sub").asText() : "";
     }
 
-    /**
-     * @return the audience
-     */
     @Override
     public List<String> getAudience() {
-        final String element = "aud";
         final List<String> list = new ArrayList<>();
-
-        if (payload.has(element)) {
-            final JsonArray aud = payload.get(element).getAsJsonArray();
-            for (final JsonElement jsonElement : aud) {
-                list.add(jsonElement.getAsString());
-            }
+        if (payload.has("aud") && payload.get("aud").isArray()) {
+            final var arr = (ArrayNode) payload.get("aud");
+            arr.forEach(n -> list.add(n.asText()));
         }
         return list;
     }
 
-    /**
-     * @return the expiration
-     */
     @Override
     public Long getExpiration() {
-        final String element = "exp";
-        return payload.has(element) ? payload.get(element).getAsLong() : 0;
+        return payload.has("exp") ? payload.get("exp").asLong() : 0L;
     }
 
-    /**
-     * @return the notBefore
-     */
     @Override
     public Long getNotBefore() {
-        final String element = "nbf";
-        return payload.has(element) ? payload.get(element).getAsLong() : 0;
+        return payload.has("nbf") ? payload.get("nbf").asLong() : 0L;
     }
 
-    /**
-     * @return the issuedAt
-     */
     @Override
     public Long getIssuedAt() {
-        final String element = "iat";
-        return payload.has(element) ? payload.get(element).getAsLong() : 0;
+        return payload.has("iat") ? payload.get("iat").asLong() : 0L;
     }
 
-    /**
-     * @return the jwtId
-     */
     @Override
     public String getJwtId() {
-        final String element = "jti";
-        return payload.has(element) ? payload.get(element).getAsString() : "";
+        return payload.has("jti") ? payload.get("jti").asText() : "";
     }
 
     @Override
     public String get(final String property) {
-        return payload.has(property) ? payload.get(property).getAsString() : "";
+        return payload.has(property) ? payload.get(property).asText() : "";
     }
 
-    /**
-     * @return the signature
-     */
     @Override
     public String getSignature() {
         return signature;
     }
 
-    /**
-     * @return the encodedHeader
-     */
     @Override
     public String getEncodedHeader() {
         return encodedHeader;
@@ -386,41 +238,29 @@ public final class JWebTokenImpl implements JWebToken {
     @Override
     public boolean isValid() {
         try {
-            if (payload.has("nbf")) {
-                return payload.get("exp").getAsLong() > LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-                        && payload.get("nbf").getAsLong() < LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)// token not expired
-                        && signature.equals(hmacSha256(encodedHeader + "." + encode(payload), SECRET_KEY));
+            final var now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+            if ((payload.has("nbf") && payload.get("nbf").asLong() > now) || !payload.has("exp") || payload.get("exp").asLong() <= now) {
+                return false;
             }
+            final var body = encode(payload);
+            final var data = encodedHeader + "." + body;
+            if (USE_RSA) {
+                final var sig = java.security.Signature.getInstance("SHA256withRSA");
+                sig.initVerify(PUBLIC_KEY);
+                sig.update(data.getBytes(StandardCharsets.UTF_8));
+                return sig.verify(Base64.getUrlDecoder().decode(signature));
+            }
+            final var expected = signData(data);
+            return expected.equals(signature);
         } catch (final Exception e) {
-            LOGGER.log(Level.WARNING, "[WARN] Error nbf token ", e);
-        }
-
-        return payload.get("exp").getAsLong() > LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) // token not expired
-                && signature.equals(hmacSha256(encodedHeader + "." + encode(payload), SECRET_KEY)); // signature matched
-    }
-
-    private String hmacSha256(final String data, final String secret) {
-        try {
-
-            final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-//			final byte[] hash = secret.getBytes(StandardCharsets.UTF_8);// digest.digest(secret.getBytes(StandardCharsets.UTF_8));
-            final byte[] hash = digest.digest(secret.getBytes(StandardCharsets.UTF_8));
-
-            final Mac sha256Hmac = Mac.getInstance("HmacSHA256");
-            final SecretKeySpec secretKey = new SecretKeySpec(hash, "HmacSHA256");
-            sha256Hmac.init(secretKey);
-
-            final byte[] signedBytes = sha256Hmac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return encode(signedBytes);
-        } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return null;
+            LOGGER.log(Level.WARNING, "Error validating JWT", e);
+            return false;
         }
     }
 
     @Override
     public String aJson() {
-        return JsonUtils.aJsonExcludeFieldsWithoutExposeAnnotation(this);
+        return JsonUtils.toJson(payload);
     }
 
     @Override
@@ -428,145 +268,115 @@ public final class JWebTokenImpl implements JWebToken {
         return encodedHeader + "." + encode(payload) + "." + signature;
     }
 
-    private static String encode(final JsonObject obj) {
-        return encode(obj.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
     private static String encode(final byte[] bytes) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private static String decode(final String encodedString) {
-        return new String(Base64.getUrlDecoder().decode(encodedString));
+    private static String encode(final JsonNode node) {
+        return encode(node.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    static boolean loadProperties(final String resourceName, final Properties props) {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL testProps = loader.getResource(resourceName);
-        if (testProps != null) {
-            try (InputStream in = testProps.openStream()) {
-                JWebTokenImpl.PROPERTIES = new Properties();
-                JWebTokenImpl.PROPERTIES.load(in);
-                return true;
-            } catch (final IOException e) {
-                LOGGER.log(Level.WARNING, "[WARN] Error loading properties config: ", e);
-            }
+    private static String decode(final String s) {
+        return new String(Base64.getUrlDecoder().decode(s), StandardCharsets.UTF_8);
+    }
+
+    private static String signData(final String data) throws Exception {
+        if (USE_RSA) {
+            final var sig = java.security.Signature.getInstance(SignType.SHA256WITHRSA.getValue());
+            sig.initSign(PRIVATE_KEY);
+            sig.update(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(sig.sign());
         }
-        return false;
+        final var mac = Mac.getInstance(SignType.HMACSHA256.getValue());
+        mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), SignType.HMACSHA256.getValue()));
+        final var hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
     }
 
-    public final static class Builder {
+    private static String getHeaderJson() {
+        return USE_RSA ? AlgorithmType.RS256.getHeader() : AlgorithmType.HS256.getHeader();
+    }
 
-        private final JsonObject PAYLOAD = new JsonObject();
-        private final LocalDateTime NOW = LocalDateTime.now();
+    /** Builder for creating JWT tokens. */
+    public static class Builder {
+        private final ObjectNode payload = MAPPER.createObjectNode();
+        private final LocalDateTime now = LocalDateTime.now();
 
         public Builder() {
-            PAYLOAD.addProperty("iss", "rafex.dev");
-            PAYLOAD.addProperty("jti", UUID.randomUUID().toString());
-            PAYLOAD.addProperty("iat", NOW.toEpochSecond(ZoneOffset.UTC));
+            payload.put("iss", "rafex.dev");
+            payload.put("jti", UUID.randomUUID().toString());
+            payload.put("iat", now.toEpochSecond(ZoneOffset.UTC));
         }
 
-        public Builder issuer(final String issuer) {
-            if (issuer != null && !issuer.isBlank()) {
-                PAYLOAD.addProperty("iss", issuer);
+        public Builder issuer(final String iss) {
+            if (iss != null && !iss.isBlank()) {
+                payload.put("iss", iss);
             }
             return this;
         }
 
-        public Builder subject(final String subject) {
-            if (subject != null && !subject.isBlank()) {
-                PAYLOAD.addProperty("sub", subject);
+        public Builder subject(final String sub) {
+            if (sub != null && !sub.isBlank()) {
+                payload.put("sub", sub);
             }
             return this;
         }
 
-        public Builder audience(final String[] audience) {
-            if (audience != null && audience.length > 0) {
-                PAYLOAD.add("aud", new Gson().toJsonTree(audience));
+        public Builder audience(final String... aud) {
+            if (aud != null && aud.length > 0) {
+                final var arr = MAPPER.createArrayNode();
+                for (final String s : aud) {
+                    arr.add(s);
+                }
+                payload.set("aud", arr);
             }
             return this;
         }
 
-        public Builder expiration(final long expiration) {
-            if (expiration > 0) {
-                PAYLOAD.addProperty("exp", expiration);
+        public Builder expiration(final long exp) {
+            if (exp > 0) {
+                payload.put("exp", exp);
             }
             return this;
         }
 
-        public Builder expirationPlusDays(final int days) {
-            if (days > 0) {
-                PAYLOAD.addProperty("exp", NOW.plusDays(days).toEpochSecond(ZoneOffset.UTC));
+        public Builder expirationPlusMinutes(final int mins) {
+            if (mins > 0) {
+                payload.put("exp", now.plusMinutes(mins).toEpochSecond(ZoneOffset.UTC));
             }
             return this;
         }
 
-        public Builder expirationPlusHours(final int hours) {
-            if (hours > 0) {
-                PAYLOAD.addProperty("exp", NOW.plusHours(hours).toEpochSecond(ZoneOffset.UTC));
+        public Builder notBeforePlusSeconds(final int secs) {
+            if (secs > 0) {
+                payload.put("nbf", now.plusSeconds(secs).toEpochSecond(ZoneOffset.UTC));
             }
             return this;
         }
 
-        public Builder expirationPlusMinutes(final int minutes) {
-            if (minutes > 0) {
-                PAYLOAD.addProperty("exp", NOW.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC));
+        public Builder claim(final String key, final String val) {
+            if (key != null && !key.isBlank() && val != null && !val.isBlank()) {
+                payload.put(key, val);
             }
             return this;
         }
 
-        public Builder notBefore(final long notBefore) {
-            if (notBefore > 0L) {
-                PAYLOAD.addProperty("nbf", notBefore);
-            }
-            return this;
+        public JWebTokenImpl build() throws Exception {
+            final var header = Base64.getUrlEncoder().withoutPadding().encodeToString(getHeaderJson().getBytes(StandardCharsets.UTF_8));
+            final var body = encode(payload);
+            final var sig = signData(header + "." + body);
+            final JsonNode pl = payload;
+            return new JWebTokenImpl(pl, header, sig);
         }
+    }
 
-        public Builder notBeforePlusMinutes(final int minutes) {
-            if (minutes > 0) {
-                PAYLOAD.addProperty("nbf", NOW.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC));
-            }
-            return this;
+    private static byte[] stripPem(final String pem) {
+        // remove PEM headers/footers and whitespace
+        final var lines = pem.replaceAll("-----BEGIN (.*)-----", "").replaceAll("-----END (.*)-----", "").split("\\r?\\n");
+        final var sb = new StringBuilder();
+        for (final String line : lines) {
+            sb.append(line.trim());
         }
-
-        public Builder notBeforePlusSeconds(final int seconds) {
-            if (seconds > 0) {
-                PAYLOAD.addProperty("nbf", NOW.plusSeconds(seconds).toEpochSecond(ZoneOffset.UTC));
-            }
-            return this;
-        }
-
-        public Builder issuedAt(final long issuedAt) {
-            if (issuedAt > 0) {
-                PAYLOAD.addProperty("iat", issuedAt);
-            }
-            return this;
-        }
-
-        public Builder jwtId(final String jwtId) {
-            if (jwtId != null && !jwtId.isBlank()) {
-                PAYLOAD.addProperty("jti", jwtId); // how do we use this?
-            }
-            return this;
-        }
-
-//		public Builder claim(final String property, final Object value) {
-//			if (property != null && !property.isBlank() && value != null) {
-//				final JsonElement jsonElement = new Gson().toJsonTree(value);
-//				payload.add(property, jsonElement);
-//			}
-//			return this;
-//		}
-
-        public Builder claim(final String property, final String value) {
-            if (property != null && !property.isBlank() && value != null && !value.isBlank()) {
-                PAYLOAD.addProperty(property, value);
-            }
-            return this;
-        }
-
-        public JWebTokenImpl build() {
-            return new JWebTokenImpl(this);
-        }
+        return Base64.getDecoder().decode(sb.toString());
     }
 }
