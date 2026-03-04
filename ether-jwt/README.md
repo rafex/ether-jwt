@@ -1,173 +1,105 @@
 # ether-jwt
 
-## Español
+Librería JWT reusable para Java 21 enfocada en emisión/verificación segura, claims tipados y resultados de validación ricos.
 
-**ether-jwt** es una librería Java liviana para crear y verificar JSON Web Tokens (JWT) usando HMAC-SHA256.
+## Estado actual
+- API nueva recomendada: `TokenIssuer` + `TokenVerifier`.
+- API legacy compatible: `JWebToken` / `JWebTokenImpl` (marcada como `@Deprecated`).
+- Sin acoplamiento a frameworks web (Jetty/Spring/etc).
 
-### Características
-
-- Generación y firma de JWT con API fluida mediante `Builder`.
-- Análisis y validación de cadenas JWT.
-- Soporte de claims estándar: `iss`, `sub`, `aud`, `exp`, `nbf`, `iat`, `jti`.
-- Añadir claims personalizados de tipo cadena.
-- Codificación Base64 URL-safe sin padding.
-- Verificación de firma con HMAC-SHA256.
-
-### Uso rápido
-
-#### Crear un JWT
-```java
-import dev.rafex.ether.jwt.impl.JWebTokenImpl;
-
-String token = new JWebTokenImpl.Builder()
-    .issuer("mi-servicio")          // por defecto "rafex.dev"
-    .subject("usuario123")
-    .audience(new String[]{"admin", "user"})
-    .expirationPlusDays(7)
-    .claim("rol", "admin")         // claim personalizado
-    .build()
-    .toString();
+## Dependencia Maven
+```xml
+<dependency>
+  <groupId>dev.rafex.ether.jwt</groupId>
+  <artifactId>ether-jwt</artifactId>
+  <version>3.0.1-SNAPSHOT</version>
+</dependency>
 ```
 
-#### Analizar y validar un JWT
+## Inicio rápido (API nueva)
 ```java
-import dev.rafex.ether.jwt.JWebToken;
-import dev.rafex.ether.jwt.impl.JWebTokenImpl;
+import dev.rafex.ether.jwt.DefaultTokenIssuer;
+import dev.rafex.ether.jwt.DefaultTokenVerifier;
+import dev.rafex.ether.jwt.JwtConfig;
+import dev.rafex.ether.jwt.KeyProvider;
+import dev.rafex.ether.jwt.TokenSpec;
+import dev.rafex.ether.jwt.TokenType;
 
-try {
-    JWebTokenImpl jwt = new JWebTokenImpl(token);
-    if (jwt.isValid()) {
-        String subject = jwt.getSubject();
-        List<String> aud = jwt.getAudience();
-        String rol = jwt.get("rol");
-        // usar claims...
-    } else {
-        // token inválido o expirado
-    }
-} catch (Exception e) {
-    // manejar errores
+import java.time.Duration;
+import java.time.Instant;
+
+JwtConfig config = JwtConfig.builder(KeyProvider.hmac("super-secret"))
+        .expectedIssuer("auth.example")
+        .expectedAudience("my-api")
+        .build();
+
+DefaultTokenIssuer issuer = new DefaultTokenIssuer(config);
+DefaultTokenVerifier verifier = new DefaultTokenVerifier(config);
+
+String token = issuer.issue(TokenSpec.builder()
+        .subject("user-123")
+        .issuer("auth.example")
+        .audience("my-api")
+        .issuedAt(Instant.now())
+        .ttl(Duration.ofMinutes(15))
+        .tokenType(TokenType.USER)
+        .roles("admin", "viewer")
+        .build());
+
+var result = verifier.verify(token, Instant.now());
+if (result.ok()) {
+    var claims = result.claims().orElseThrow();
+    // usar claims tipados
 }
 ```
 
-### Referencia de API
+## Documentación detallada
+- Guía completa de uso: [`docs/USAGE_ES.md`](docs/USAGE_ES.md)
+- Migración legacy -> API nueva: [`MIGRATION.md`](MIGRATION.md)
+- Script de llaves RSA: `../generate-jwt-keys.sh`
+- Script de secreto HMAC: `../generate-jwt-hmac-secret.sh`
 
-#### Interfaz `JWebToken`
+## Generación de material criptográfico
 
-- `JsonObject getPayload()` – Payload JSON crudo.
-- `String getIssuer()` – Claim `iss`.
-- `String getSubject()` – Claim `sub`.
-- `List<String> getAudience()` – Claim `aud`.
-- `Long getExpiration()` – Claim `exp` (epoch segundos).
-- `Long getNotBefore()` – Claim `nbf` (epoch segundos).
-- `Long getIssuedAt()` – Claim `iat` (epoch segundos).
-- `String getJwtId()` – Claim `jti`.
-- `String get(String property)` – Claim personalizado.
-- `String getSignature()` – Firma del token.
-- `String getEncodedHeader()` – Header codificado Base64URL.
-- `boolean isValid()` – Verifica expiración, `nbf` y firma.
-- `String aJson()` – Exporta token como JSON (excluye campos sin `@Expose`).
-
-#### Clase `JWebTokenImpl.Builder`
-Fluent builder para crear JWT firmados.
-
-- `.issuer(String issuer)`
-- `.subject(String subject)`
-- `.audience(String[] audience)`
-- `.expiration(long epochSeconds)`
-- `.expirationPlusDays(int days)`
-- `.expirationPlusHours(int hours)`
-- `.expirationPlusMinutes(int minutes)`
-- `.notBefore(long epochSeconds)`
-- `.notBeforePlusMinutes(int minutes)`
-- `.notBeforePlusSeconds(int seconds)`
-- `.issuedAt(long epochSeconds)`
-- `.jwtId(String jti)`
-- `.claim(String name, String value)`
-- `.build()` – Devuelve `JWebTokenImpl`.
-
----
-## English
-
-**ether-jwt** is a lightweight Java library for creating and verifying JSON Web Tokens (JWT) using HMAC-SHA256.
-
-### Features
-
-- Create and sign JWTs with a fluent `Builder` API.
-- Parse and validate JWT strings.
-- Support standard claims: `iss`, `sub`, `aud`, `exp`, `nbf`, `iat`, `jti`.
-- Add custom string claims.
-- Base64 URL-safe encoding without padding.
-- Signature verification with HMAC-SHA256.
-
-### Quick Start
-
-#### Create a JWT
-```java
-import dev.rafex.ether.jwt.impl.JWebTokenImpl;
-
-String token = new JWebTokenImpl.Builder()
-    .issuer("my-service")            // default "rafex.dev"
-    .subject("user123")
-    .audience(new String[]{"admin", "user"})
-    .expirationPlusDays(7)
-    .claim("role", "admin")         // custom claim
-    .build()
-    .toString();
+### RSA (script oficial)
+Desde `ether-deployment-hub/ether-jwt`:
+```bash
+./generate-jwt-keys.sh -d ./keys -n jwt
 ```
 
-#### Parse and Validate a JWT
-```java
-import dev.rafex.ether.jwt.JWebToken;
-import dev.rafex.ether.jwt.impl.JWebTokenImpl;
+Salida esperada:
+- `./keys/jwt_private.pem`
+- `./keys/jwt_public.pem`
 
-try {
-    JWebTokenImpl jwt = new JWebTokenImpl(token);
-    if (jwt.isValid()) {
-        String subject = jwt.getSubject();
-        List<String> aud = jwt.getAudience();
-        String role = jwt.get("role");
-        // use claims...
-    } else {
-        // token invalid or expired
-    }
-} catch (Exception e) {
-    // handle errors
-}
+Uso en Java:
+```java
+KeyProvider.rsa(privateKey, publicKey);      // emitir
+KeyProvider.rsaVerifier(publicKey);          // verificar
 ```
 
-### API Reference
+### HMAC (secreto compartido)
+HMAC no usa certificados/pares de llaves.
 
-#### Interface `JWebToken`
+Generación con script oficial (desde `ether-deployment-hub/ether-jwt`):
+```bash
+./generate-jwt-hmac-secret.sh -d ./keys -n jwt -b 48
+```
 
-- `JsonObject getPayload()` – Raw JSON payload.
-- `String getIssuer()` – `iss` claim.
-- `String getSubject()` – `sub` claim.
-- `List<String> getAudience()` – `aud` claim.
-- `Long getExpiration()` – `exp` claim (epoch seconds).
-- `Long getNotBefore()` – `nbf` claim (epoch seconds).
-- `Long getIssuedAt()` – `iat` claim (epoch seconds).
-- `String getJwtId()` – `jti` claim.
-- `String get(String property)` – Custom claim.
-- `String getSignature()` – Token signature.
-- `String getEncodedHeader()` – Base64URL-encoded header.
-- `boolean isValid()` – Check expiry, `nbf` and signature.
-- `String aJson()` – Export token as JSON (excludes non-`@Expose`).
+Archivos generados:
+- `./keys/jwt_hmac.secret`
+- `./keys/jwt_hmac.properties`
 
-#### Class `JWebTokenImpl.Builder`
+Alternativa manual:
+```bash
+openssl rand -base64 48
+```
 
-Fluent builder for creating signed JWTs.
+Luego configúralo en tu servicio (ejemplo variable de entorno):
+```bash
+export JWT_SECRET='...valor_generado...'
+```
 
-- `.issuer(String issuer)`
-- `.subject(String subject)`
-- `.audience(String[] audience)`
-- `.expiration(long epochSeconds)`
-- `.expirationPlusDays(int days)`
-- `.expirationPlusHours(int hours)`
-- `.expirationPlusMinutes(int minutes)`
-- `.notBefore(long epochSeconds)`
-- `.notBeforePlusMinutes(int minutes)`
-- `.notBeforePlusSeconds(int seconds)`
-- `.issuedAt(long epochSeconds)`
-- `.jwtId(String jti)`
-- `.claim(String name, String value)`
-- `.build()` – Returns `JWebTokenImpl`.
+## Build
+```bash
+mvn test
+```
