@@ -2,6 +2,7 @@
 PROJECT_DIR         := ether-jwt
 PROJECT_GROUP_ID    := dev.rafex.ether.jwt
 PROJECT_ARTIFACT_ID := ether-jwt
+DEPENDENCY_COORDS   := ether-json.version=dev.rafex.ether.json:ether-json
 
 # Include shared build logic
 include ../build-helpers/common.mk
