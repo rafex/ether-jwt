@@ -59,7 +59,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<ether-json.version>4.0.0-SNAPSHOT</ether-json.version>
+		<ether-json.version>4.0.0-v20260304</ether-json.version>
 	</properties>
 
 	<dependencies>
