@@ -1,5 +1,9 @@
 package dev.rafex.ether.test.jwt;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 /*-
  * #%L
  * ether-jwt
@@ -28,9 +32,6 @@ package dev.rafex.ether.test.jwt;
 
 import dev.rafex.ether.jwt.JWebToken;
 import dev.rafex.ether.jwt.impl.JWebTokenImpl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("deprecation")
 public class TestJWebTokenHMAC {
@@ -42,12 +43,8 @@ public class TestJWebTokenHMAC {
 
     @Test
     void legacyBuilderCreatesValidToken() {
-        final JWebToken token = new JWebTokenImpl.Builder()
-                .issuer("issuer-legacy")
-                .subject("user-123")
-                .audience("legacy-api")
-                .expirationPlusMinutes(10)
-                .build();
+        final JWebToken token = new JWebTokenImpl.Builder().issuer("issuer-legacy").subject("user-123")
+                .audience("legacy-api").expirationPlusMinutes(10).build();
 
         final JWebToken parsed = new JWebTokenImpl(token.toString());
         Assertions.assertTrue(parsed.isValid());
@@ -57,12 +54,8 @@ public class TestJWebTokenHMAC {
 
     @Test
     void legacyClaimBridgeWorks() {
-        final JWebToken token = new JWebTokenImpl.Builder()
-                .subject("user-123")
-                .audience("legacy-api")
-                .expirationPlusMinutes(10)
-                .claim("tenant_id", "tenant-a")
-                .build();
+        final JWebToken token = new JWebTokenImpl.Builder().subject("user-123").audience("legacy-api")
+                .expirationPlusMinutes(10).claim("tenant_id", "tenant-a").build();
 
         final JWebToken parsed = new JWebTokenImpl(token.toString());
         Assertions.assertTrue(parsed.isValid());

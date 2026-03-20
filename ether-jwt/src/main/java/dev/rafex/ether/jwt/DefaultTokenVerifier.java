@@ -1,5 +1,8 @@
 package dev.rafex.ether.jwt;
 
+import java.time.Instant;
+import java.util.Objects;
+
 /*-
  * #%L
  * ether-jwt
@@ -30,9 +33,6 @@ import dev.rafex.ether.jwt.internal.ClaimsMapper;
 import dev.rafex.ether.jwt.internal.JwtCodec;
 import dev.rafex.ether.jwt.internal.JwtSigner;
 import dev.rafex.ether.jwt.internal.TokenValidator;
-
-import java.time.Instant;
-import java.util.Objects;
 
 /** Default implementation of {@link TokenVerifier}. */
 public final class DefaultTokenVerifier implements TokenVerifier {

@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /** Normalized claims extracted from a JWT token. */
 public final class TokenClaims {
@@ -112,18 +111,8 @@ public final class TokenClaims {
     }
 
     public Builder toBuilder() {
-        return builder()
-                .subject(subject)
-                .issuer(issuer)
-                .audience(audience)
-                .expiresAt(expiresAt)
-                .issuedAt(issuedAt)
-                .notBefore(notBefore)
-                .jwtId(jwtId)
-                .roles(roles)
-                .tokenType(tokenType)
-                .clientId(clientId)
-                .extras(extras);
+        return builder().subject(subject).issuer(issuer).audience(audience).expiresAt(expiresAt).issuedAt(issuedAt)
+                .notBefore(notBefore).jwtId(jwtId).roles(roles).tokenType(tokenType).clientId(clientId).extras(extras);
     }
 
     private static List<String> immutableList(final List<String> input) {

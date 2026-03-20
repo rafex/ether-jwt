@@ -28,8 +28,7 @@ package dev.rafex.ether.jwt;
 
 /** Supported JWT signature algorithms. */
 public enum JwtAlgorithm {
-    HS256("HS256"),
-    RS256("RS256");
+    HS256("HS256"), RS256("RS256");
 
     private final String headerValue;
 

@@ -1,5 +1,23 @@
 package dev.rafex.ether.jwt.impl;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
 /*-
  * #%L
  * ether-jwt
@@ -28,7 +46,7 @@ package dev.rafex.ether.jwt.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import dev.rafex.ether.jwt.DefaultTokenIssuer;
 import dev.rafex.ether.jwt.DefaultTokenVerifier;
 import dev.rafex.ether.jwt.JWebToken;
@@ -37,29 +55,11 @@ import dev.rafex.ether.jwt.JwtConfig;
 import dev.rafex.ether.jwt.KeyProvider;
 import dev.rafex.ether.jwt.TokenSpec;
 import dev.rafex.ether.jwt.VerificationResult;
-import dev.rafex.ether.jwt.internal.ClaimsMapper;
 import dev.rafex.ether.jwt.internal.JwtCodec;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
 /**
- * Legacy JWT implementation. Prefer {@link DefaultTokenIssuer} + {@link DefaultTokenVerifier}.
+ * Legacy JWT implementation. Prefer {@link DefaultTokenIssuer} +
+ * {@link DefaultTokenVerifier}.
  *
  * @deprecated Use reusable APIs in package {@code dev.rafex.ether.jwt}.
  */
@@ -73,7 +73,8 @@ public final class JWebTokenImpl implements JWebToken {
     private final String encodedHeader;
     private final String token;
 
-    private JWebTokenImpl(final String token, final JsonNode payload, final String encodedHeader, final String signature) {
+    private JWebTokenImpl(final String token, final JsonNode payload, final String encodedHeader,
+            final String signature) {
         this.token = token;
         this.payload = payload;
         this.encodedHeader = encodedHeader;
@@ -239,12 +240,8 @@ public final class JWebTokenImpl implements JWebToken {
         }
 
         public JWebTokenImpl build() {
-            final TokenSpec.Builder spec = TokenSpec.builder()
-                    .issuer(issuer)
-                    .subject(subject)
-                    .issuedAt(issuedAt)
-                    .jwtId(jwtId)
-                    .audience(audience.toArray(String[]::new));
+            final TokenSpec.Builder spec = TokenSpec.builder().issuer(issuer).subject(subject).issuedAt(issuedAt)
+                    .jwtId(jwtId).audience(audience.toArray(String[]::new));
 
             if (expiresAt != null) {
                 spec.expiresAt(expiresAt);
@@ -277,7 +274,8 @@ public final class JWebTokenImpl implements JWebToken {
 
         private static JwtConfig loadConfig() {
             final Properties properties = new Properties();
-            try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("jwt.properties")) {
+            try (InputStream in = Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("jwt.properties")) {
                 if (in != null) {
                     properties.load(in);
                 }
@@ -304,11 +302,14 @@ public final class JWebTokenImpl implements JWebToken {
         }
 
         private static KeyProvider resolveKeyProvider(final Properties properties) {
-            final String configuredAlgorithm = firstNonBlank(properties.getProperty("jwt.algorithm"), System.getenv("JWT_ALGORITHM"));
+            final String configuredAlgorithm = firstNonBlank(properties.getProperty("jwt.algorithm"),
+                    System.getenv("JWT_ALGORITHM"));
 
             final String secret = firstNonBlank(properties.getProperty("jwt.secret"), System.getenv("JWT_SECRET"));
-            final String privateKeyText = readKeyText(properties, "jwt.privateKey", "JWT_PRIVATE_KEY", "jwt.privateKeyPath", "JWT_PRIVATE_KEY_PATH");
-            final String publicKeyText = readKeyText(properties, "jwt.publicKey", "JWT_PUBLIC_KEY", "jwt.publicKeyPath", "JWT_PUBLIC_KEY_PATH");
+            final String privateKeyText = readKeyText(properties, "jwt.privateKey", "JWT_PRIVATE_KEY",
+                    "jwt.privateKeyPath", "JWT_PRIVATE_KEY_PATH");
+            final String publicKeyText = readKeyText(properties, "jwt.publicKey", "JWT_PUBLIC_KEY", "jwt.publicKeyPath",
+                    "JWT_PUBLIC_KEY_PATH");
 
             final JwtAlgorithm algorithm;
             if (configuredAlgorithm != null) {
@@ -332,7 +333,8 @@ public final class JWebTokenImpl implements JWebToken {
 
             try {
                 final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                final PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(stripPem(privateKeyText)));
+                final PrivateKey privateKey = keyFactory
+                        .generatePrivate(new PKCS8EncodedKeySpec(stripPem(privateKeyText)));
                 final PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(stripPem(publicKeyText)));
                 return KeyProvider.rsa(privateKey, publicKey);
             } catch (final Exception e) {
@@ -340,12 +342,8 @@ public final class JWebTokenImpl implements JWebToken {
             }
         }
 
-        private static String readKeyText(
-                final Properties properties,
-                final String inlineProperty,
-                final String inlineEnv,
-                final String pathProperty,
-                final String pathEnv) {
+        private static String readKeyText(final Properties properties, final String inlineProperty,
+                final String inlineEnv, final String pathProperty, final String pathEnv) {
             final String inlineValue = firstNonBlank(properties.getProperty(inlineProperty), System.getenv(inlineEnv));
             if (inlineValue != null) {
                 return inlineValue;
@@ -372,9 +370,7 @@ public final class JWebTokenImpl implements JWebToken {
         }
 
         private static byte[] stripPem(final String pem) {
-            final String body = pem
-                    .replaceAll("-----BEGIN (.*)-----", "")
-                    .replaceAll("-----END (.*)-----", "")
+            final String body = pem.replaceAll("-----BEGIN (.*)-----", "").replaceAll("-----END (.*)-----", "")
                     .replaceAll("\\s", "");
             return Base64.getDecoder().decode(body);
         }

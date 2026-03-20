@@ -1,5 +1,11 @@
 package dev.rafex.ether.jwt.internal;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /*-
  * #%L
  * ether-jwt
@@ -31,14 +37,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import dev.rafex.ether.jwt.TokenClaims;
 import dev.rafex.ether.jwt.TokenType;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public final class ClaimsMapper {
 
@@ -77,19 +78,12 @@ public final class ClaimsMapper {
         extras.keySet().removeIf(ClaimsMapper::isKnownClaim);
 
         final String tokenTypeRaw = asText(payload.get("token_type"));
-        return TokenClaims.builder()
-                .subject(asText(payload.get("sub")))
-                .issuer(asText(payload.get("iss")))
-                .audience(readStringList(payload.get("aud")))
-                .issuedAt(asInstant(payload.get("iat")))
-                .expiresAt(asInstant(payload.get("exp")))
-                .notBefore(asInstant(payload.get("nbf")))
-                .jwtId(asText(payload.get("jti")))
-                .roles(readStringList(payload.get("roles")))
+        return TokenClaims.builder().subject(asText(payload.get("sub"))).issuer(asText(payload.get("iss")))
+                .audience(readStringList(payload.get("aud"))).issuedAt(asInstant(payload.get("iat")))
+                .expiresAt(asInstant(payload.get("exp"))).notBefore(asInstant(payload.get("nbf")))
+                .jwtId(asText(payload.get("jti"))).roles(readStringList(payload.get("roles")))
                 .tokenType(tokenTypeRaw == null ? null : TokenType.fromClaimValue(tokenTypeRaw))
-                .clientId(asText(payload.get("client_id")))
-                .extras(extras)
-                .build();
+                .clientId(asText(payload.get("client_id"))).extras(extras).build();
     }
 
     public static String tokenTypeRaw(final JsonNode payload) {
@@ -97,16 +91,9 @@ public final class ClaimsMapper {
     }
 
     private static boolean isKnownClaim(final String claim) {
-        return "sub".equals(claim)
-                || "iss".equals(claim)
-                || "aud".equals(claim)
-                || "exp".equals(claim)
-                || "iat".equals(claim)
-                || "nbf".equals(claim)
-                || "jti".equals(claim)
-                || "roles".equals(claim)
-                || "token_type".equals(claim)
-                || "client_id".equals(claim);
+        return "sub".equals(claim) || "iss".equals(claim) || "aud".equals(claim) || "exp".equals(claim)
+                || "iat".equals(claim) || "nbf".equals(claim) || "jti".equals(claim) || "roles".equals(claim)
+                || "token_type".equals(claim) || "client_id".equals(claim);
     }
 
     private static void putString(final ObjectNode node, final String name, final String value) {

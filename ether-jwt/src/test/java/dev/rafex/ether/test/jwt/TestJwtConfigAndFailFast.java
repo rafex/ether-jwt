@@ -1,5 +1,12 @@
 package dev.rafex.ether.test.jwt;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.time.Duration;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 /*-
  * #%L
  * ether-jwt
@@ -32,39 +39,25 @@ import dev.rafex.ether.jwt.JwtAlgorithm;
 import dev.rafex.ether.jwt.JwtConfig;
 import dev.rafex.ether.jwt.KeyProvider;
 import dev.rafex.ether.jwt.TokenSpec;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.time.Duration;
 
 public class TestJwtConfigAndFailFast {
 
     @Test
     void tokenSpecRequiresSubjectAndExpiry() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> TokenSpec.builder()
-                .issuer("iss")
-                .ttl(Duration.ofMinutes(5))
-                .build());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> TokenSpec.builder().issuer("iss").ttl(Duration.ofMinutes(5)).build());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> TokenSpec.builder()
-                .subject("sub")
-                .issuer("iss")
-                .build());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> TokenSpec.builder().subject("sub").issuer("iss").build());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> TokenSpec.builder()
-                .subject("sub")
-                .issuer("iss")
-                .ttl(Duration.ZERO)
-                .build());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> TokenSpec.builder().subject("sub").issuer("iss").ttl(Duration.ZERO).build());
     }
 
     @Test
     void jwtConfigRejectsNegativeClockSkew() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> JwtConfig.builder(KeyProvider.hmac("secret"))
-                .clockSkew(Duration.ofSeconds(-1))
-                .build());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> JwtConfig.builder(KeyProvider.hmac("secret")).clockSkew(Duration.ofSeconds(-1)).build());
     }
 
     @Test

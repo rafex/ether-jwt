@@ -1,5 +1,9 @@
 package dev.rafex.ether.test.jwt;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 /*-
  * #%L
  * ether-jwt
@@ -28,9 +32,6 @@ package dev.rafex.ether.test.jwt;
 
 import dev.rafex.ether.jwt.JWebToken;
 import dev.rafex.ether.jwt.impl.JWebTokenImpl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("deprecation")
 public class TestJWebTokenRSA {
@@ -42,14 +43,12 @@ public class TestJWebTokenRSA {
 
     @Test
     void legacyTokenHasJwtHeader() {
-        final JWebToken token = new JWebTokenImpl.Builder()
-                .subject("legacy-rsa-name-test")
-                .audience("legacy-api")
-                .expirationPlusMinutes(5)
-                .build();
+        final JWebToken token = new JWebTokenImpl.Builder().subject("legacy-rsa-name-test").audience("legacy-api")
+                .expirationPlusMinutes(5).build();
 
         final JWebToken parsed = new JWebTokenImpl(token.toString());
-        final String header = new String(java.util.Base64.getUrlDecoder().decode(parsed.getEncodedHeader()), java.nio.charset.StandardCharsets.UTF_8);
+        final String header = new String(java.util.Base64.getUrlDecoder().decode(parsed.getEncodedHeader()),
+                java.nio.charset.StandardCharsets.UTF_8);
 
         Assertions.assertTrue(parsed.isValid());
         Assertions.assertTrue(header.contains("\"typ\":\"JWT\""));

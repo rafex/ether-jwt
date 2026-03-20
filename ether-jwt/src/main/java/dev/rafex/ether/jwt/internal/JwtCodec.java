@@ -1,5 +1,8 @@
 package dev.rafex.ether.jwt.internal;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 /*-
  * #%L
  * ether-jwt
@@ -29,9 +32,6 @@ package dev.rafex.ether.jwt.internal;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 public final class JwtCodec {
 
@@ -84,12 +84,8 @@ public final class JwtCodec {
         private final JsonNode header;
         private final JsonNode payload;
 
-        ParsedJwt(
-                final String encodedHeader,
-                final String encodedPayload,
-                final String encodedSignature,
-                final JsonNode header,
-                final JsonNode payload) {
+        ParsedJwt(final String encodedHeader, final String encodedPayload, final String encodedSignature,
+                final JsonNode header, final JsonNode payload) {
             this.encodedHeader = encodedHeader;
             this.encodedPayload = encodedPayload;
             this.encodedSignature = encodedSignature;

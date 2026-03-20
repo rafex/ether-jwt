@@ -28,14 +28,14 @@ package dev.rafex.ether.jwt.enums;
 
 public enum SignType {
 
-    HMACSHA256("HmacSHA256"), SHA256WITHRSA("SHA256withRSA"), SHA256WITHRSAPSS("SHA256withRSAPSS") ;
-    
+    HMACSHA256("HmacSHA256"), SHA256WITHRSA("SHA256withRSA"), SHA256WITHRSAPSS("SHA256withRSAPSS");
+
     private final String value;
-    
+
     SignType(String value) {
         this.value = value;
     }
-    
+
     public String getValue() {
         return value;
     }

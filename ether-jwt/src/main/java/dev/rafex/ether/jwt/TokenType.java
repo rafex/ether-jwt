@@ -28,8 +28,7 @@ package dev.rafex.ether.jwt;
 
 /** Supported business token types. */
 public enum TokenType {
-    USER("user"),
-    APP("app");
+    USER("user"), APP("app");
 
     private final String claimValue;
 

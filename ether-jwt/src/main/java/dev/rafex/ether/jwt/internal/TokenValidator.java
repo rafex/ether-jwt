@@ -1,5 +1,7 @@
 package dev.rafex.ether.jwt.internal;
 
+import java.time.Instant;
+
 /*-
  * #%L
  * ether-jwt
@@ -27,24 +29,19 @@ package dev.rafex.ether.jwt.internal;
  */
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import dev.rafex.ether.jwt.JwtConfig;
 import dev.rafex.ether.jwt.TokenClaims;
 import dev.rafex.ether.jwt.TokenType;
 import dev.rafex.ether.jwt.VerificationCode;
-
-import java.time.Instant;
 
 public final class TokenValidator {
 
     private TokenValidator() {
     }
 
-    public static VerificationCode validate(
-            final TokenClaims claims,
-            final JsonNode payload,
-            final JwtConfig config,
-            final Instant now,
-            final String tokenTypeRaw) {
+    public static VerificationCode validate(final TokenClaims claims, final JsonNode payload, final JwtConfig config,
+            final Instant now, final String tokenTypeRaw) {
 
         if (config.requireSubject() && isBlank(claims.subject())) {
             return VerificationCode.MISSING_SUB;

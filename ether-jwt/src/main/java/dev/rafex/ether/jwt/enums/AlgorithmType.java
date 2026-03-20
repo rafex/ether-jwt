@@ -28,14 +28,14 @@ package dev.rafex.ether.jwt.enums;
 
 public enum AlgorithmType {
 
-    RS256("{\"alg\":\"RS256\",\"typ\":\"JWT\"}"),HS256("{\"alg\":\"HS256\",\"typ\":\"JWT\"}");
-    
+    RS256("{\"alg\":\"RS256\",\"typ\":\"JWT\"}"), HS256("{\"alg\":\"HS256\",\"typ\":\"JWT\"}");
+
     private final String header;
-    
+
     AlgorithmType(String header) {
         this.header = header;
     }
-    
+
     public String getHeader() {
         return header;
     }

@@ -78,10 +78,7 @@ public interface KeyProvider {
         private final PrivateKey privateKey;
         private final PublicKey publicKey;
 
-        private BasicKeyProvider(
-                final JwtAlgorithm algorithm,
-                final byte[] hmacSecret,
-                final PrivateKey privateKey,
+        private BasicKeyProvider(final JwtAlgorithm algorithm, final byte[] hmacSecret, final PrivateKey privateKey,
                 final PublicKey publicKey) {
             this.algorithm = Objects.requireNonNull(algorithm, "algorithm");
             this.hmacSecret = hmacSecret == null ? null : Arrays.copyOf(hmacSecret, hmacSecret.length);

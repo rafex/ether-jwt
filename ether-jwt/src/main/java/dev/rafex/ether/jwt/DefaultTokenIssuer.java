@@ -1,5 +1,7 @@
 package dev.rafex.ether.jwt;
 
+import java.util.Objects;
+
 /*-
  * #%L
  * ether-jwt
@@ -29,8 +31,6 @@ package dev.rafex.ether.jwt;
 import dev.rafex.ether.jwt.internal.ClaimsMapper;
 import dev.rafex.ether.jwt.internal.JwtCodec;
 import dev.rafex.ether.jwt.internal.JwtSigner;
-
-import java.util.Objects;
 
 /** Default implementation of {@link TokenIssuer}. */
 public final class DefaultTokenIssuer implements TokenIssuer {

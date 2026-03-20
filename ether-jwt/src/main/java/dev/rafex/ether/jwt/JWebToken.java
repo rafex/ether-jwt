@@ -1,5 +1,7 @@
 package dev.rafex.ether.jwt;
 
+import java.util.List;
+
 /*-
  * #%L
  * ether-jwt
@@ -28,12 +30,11 @@ package dev.rafex.ether.jwt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.List;
-
 /**
  * Legacy JWT contract. Prefer {@link TokenIssuer} + {@link TokenVerifier}.
  *
- * @deprecated Use {@link TokenSpec}, {@link DefaultTokenIssuer} and {@link VerificationResult}.
+ * @deprecated Use {@link TokenSpec}, {@link DefaultTokenIssuer} and
+ *             {@link VerificationResult}.
  */
 @Deprecated(since = "3.1.0", forRemoval = false)
 public interface JWebToken {

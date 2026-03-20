@@ -1,5 +1,13 @@
 package dev.rafex.ether.jwt.internal;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.util.Base64;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 /*-
  * #%L
  * ether-jwt
@@ -30,13 +38,6 @@ import dev.rafex.ether.jwt.JwtAlgorithm;
 import dev.rafex.ether.jwt.JwtConfig;
 import dev.rafex.ether.jwt.KeyProvider;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.Signature;
-import java.util.Base64;
-
 public final class JwtSigner {
 
     private JwtSigner() {
@@ -46,7 +47,8 @@ public final class JwtSigner {
         try {
             final KeyProvider keyProvider = config.keyProvider();
             if (keyProvider.algorithm() == JwtAlgorithm.HS256) {
-                final byte[] signature = signHmac(signingInput.getBytes(StandardCharsets.UTF_8), keyProvider.hmacSecret());
+                final byte[] signature = signHmac(signingInput.getBytes(StandardCharsets.UTF_8),
+                        keyProvider.hmacSecret());
                 return Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
             }
             final Signature rsa = Signature.getInstance("SHA256withRSA");
@@ -62,7 +64,8 @@ public final class JwtSigner {
         try {
             final KeyProvider keyProvider = config.keyProvider();
             if (keyProvider.algorithm() == JwtAlgorithm.HS256) {
-                final byte[] expected = signHmac(signingInput.getBytes(StandardCharsets.UTF_8), keyProvider.hmacSecret());
+                final byte[] expected = signHmac(signingInput.getBytes(StandardCharsets.UTF_8),
+                        keyProvider.hmacSecret());
                 final byte[] provided = Base64.getUrlDecoder().decode(encodedSignature);
                 return MessageDigest.isEqual(expected, provided);
             }

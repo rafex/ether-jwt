@@ -119,7 +119,8 @@ public final class JwtConfig {
         }
 
         public Builder expectedAudience(final Set<String> expectedAudience) {
-            this.expectedAudience = expectedAudience == null ? new LinkedHashSet<>() : new LinkedHashSet<>(expectedAudience);
+            this.expectedAudience = expectedAudience == null ? new LinkedHashSet<>()
+                    : new LinkedHashSet<>(expectedAudience);
             this.expectedAudience.removeIf(value -> value == null || value.isBlank());
             return this;
         }

@@ -30,7 +30,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 /** Specification used by {@link TokenIssuer} to issue JWT tokens. */
@@ -49,19 +48,11 @@ public final class TokenSpec {
             throw new IllegalArgumentException("expiresAt or ttl is required");
         }
 
-        claims = TokenClaims.builder()
-                .subject(builder.subject)
-                .issuer(builder.issuer)
-                .audience(builder.audience)
-                .issuedAt(issuedAt)
-                .expiresAt(expiresAt)
-                .notBefore(builder.notBefore)
+        claims = TokenClaims.builder().subject(builder.subject).issuer(builder.issuer).audience(builder.audience)
+                .issuedAt(issuedAt).expiresAt(expiresAt).notBefore(builder.notBefore)
                 .jwtId(builder.jwtId == null || builder.jwtId.isBlank() ? UUID.randomUUID().toString() : builder.jwtId)
-                .roles(builder.roles)
-                .tokenType(builder.tokenType)
-                .clientId(builder.clientId)
-                .extras(builder.customClaims)
-                .build();
+                .roles(builder.roles).tokenType(builder.tokenType).clientId(builder.clientId)
+                .extras(builder.customClaims).build();
     }
 
     public static Builder builder() {
