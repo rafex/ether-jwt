@@ -1,5 +1,7 @@
 package dev.rafex.ether.jwt;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * ether-jwt
@@ -41,11 +43,9 @@ public enum JwtAlgorithm {
     }
 
     public static JwtAlgorithm fromHeaderValue(final String value) {
-        for (final JwtAlgorithm algorithm : values()) {
-            if (algorithm.headerValue.equals(value)) {
-                return algorithm;
-            }
-        }
-        return null;
+        return Arrays.stream(values())
+                .filter(a -> a.headerValue.equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }
