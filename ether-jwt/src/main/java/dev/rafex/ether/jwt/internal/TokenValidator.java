@@ -35,11 +35,28 @@ import dev.rafex.ether.jwt.TokenClaims;
 import dev.rafex.ether.jwt.TokenType;
 import dev.rafex.ether.jwt.VerificationCode;
 
+/**
+ * Valida tokens JWT contra las reglas de configuración.
+ * <p>
+ * Esta clase contiene la lógica de validación de claims, fechas de expiración,
+ * y reglas específicas de aplicación. Es una clase utilitaria con métodos estáticos.
+ * </p>
+ */
 public final class TokenValidator {
 
     private TokenValidator() {
     }
 
+    /**
+     * Valida las reclamaciones (claims) del token según la configuración.
+     *
+     * @param claims Las reclamaciones extraídas del token
+     * @param payload El payload JSON original (para compatibilidad)
+     * @param config La configuración de validación JWT
+     * @param now La hora actual para validaciones de tiempo
+     * @param tokenTypeRaw El tipo de token crudo (puede ser null)
+     * @return El código de verificación indicando el resultado
+     */
     public static VerificationCode validate(final TokenClaims claims, final JsonNode payload, final JwtConfig config,
             final Instant now, final String tokenTypeRaw) {
 
